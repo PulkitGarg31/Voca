@@ -1,0 +1,31 @@
+{
+  "name": "voca",
+  "version": "1.0.0",
+  "description": "Vocabulary Learning Platform with AI-powered word discovery",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.2.10",
+    "@langchain/google-genai": "^0.0.23",
+    "@langchain/mongodb": "^0.0.1",
+    "bcryptjs": "^2.4.3",
+    "langchain": "^0.2.10",
+    "mongoose": "^8.4.0",
+    "next": "^14.2.0",
+    "next-auth": "^4.24.7",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4"
+  }
+}

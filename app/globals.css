@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap");
+
+/* ─── Theme tokens (RGB channels) ───────────────────────────── */
+:root {
+  --bg: 232 229 222;          /* #e8e5de page */
+  --surface: 240 237 230;     /* #f0ede6 cards */
+  --surface-2: 224 221 213;   /* inner panels */
+  --line: 214 211 204;        /* #d6d3cc borders */
+  --line-strong: 187 184 176; /* #bbb8b0 hover borders / decorative display */
+  --ink: 17 17 17;            /* #111 primary text */
+  --muted: 136 133 128;       /* #888580 secondary text */
+  --faint: 170 168 160;       /* #aaa8a0 tertiary text */
+  --ghost: 214 211 204;       /* ghost button bg */
+  --ghost-hover: 200 197 190; /* #c8c5be ghost hover */
+  --accent: 240 90 26;        /* #f05a1a */
+  --accent-hover: 217 78 16;  /* #d94e10 */
+  --cell-0: 219 216 209;      /* empty heatmap cell */
+  color-scheme: light;
+}
+
+.dark {
+  --bg: 26 24 21;
+  --surface: 38 35 31;
+  --surface-2: 47 43 38;
+  --line: 58 53 47;
+  --line-strong: 78 72 63;
+  --ink: 240 237 230;
+  --muted: 162 156 145;
+  --faint: 113 108 100;
+  --ghost: 54 50 45;
+  --ghost-hover: 68 64 57;
+  --accent: 240 90 26;
+  --accent-hover: 255 107 45;
+  --cell-0: 47 43 38;
+  color-scheme: dark;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    background-color: rgb(var(--bg));
+    color: rgb(var(--ink));
+    font-family: "DM Sans", var(--font-inter), system-ui, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  h1, h2, h3, .display {
+    font-family: "Bebas Neue", sans-serif;
+    letter-spacing: 0.02em;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent hover:bg-accent-hover active:scale-95 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-ghost {
+    @apply bg-ghost hover:bg-ghost-hover text-ink text-sm font-semibold px-6 py-3 rounded-full transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .input {
+    @apply w-full border border-line bg-surface-2 text-ink rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder:text-faint;
+  }
+  .stat-card {
+    @apply bg-surface border border-line rounded-2xl p-5 flex items-center gap-4 hover:border-line-strong transition-all;
+  }
+  .word-card {
+    @apply bg-surface border border-line rounded-2xl p-5 hover:border-line-strong hover:shadow-sm transition-all duration-150;
+  }
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  /* Generic display heading helpers (Bebas Neue) */
+  .display { @apply font-display leading-none tracking-[0.02em] text-ink; }
+  .display-muted { color: rgb(var(--line-strong)); }
+  .page-title {
+    @apply font-display text-[6rem] leading-none tracking-wide text-ink;
+  }
+  .section-label {
+    @apply text-[10px] font-semibold tracking-[0.2em] text-muted uppercase;
+  }
+  .panel {
+    @apply bg-surface border border-line rounded-2xl;
+  }
+  .nav-item {
+    @apply flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-muted hover:text-ink hover:bg-surface-2 transition-colors;
+  }
+  .nav-item.active {
+    @apply bg-ink text-white;
+  }
+  .scrollbar-thin::-webkit-scrollbar { width: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: rgb(var(--line)); border-radius: 99px; }
+}
