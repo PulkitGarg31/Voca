@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
+import { LogoTile } from "@/components/Logo";
 
 const NAV = [
   { label: "Statistics", href: "/statistics" },
@@ -22,11 +23,7 @@ export default function Navbar({ user }) {
       <div className="bg-surface/95 border border-line rounded-full px-5 py-2.5 flex items-center justify-between shadow-sm">
         {/* Logo */}
         <Link href="/statistics" className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
-            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
-              <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
-            </svg>
-          </div>
+          <LogoTile className="h-7 w-7 flex-shrink-0" markClassName="h-3.5 w-3.5" />
           <span className="font-display text-lg font-extrabold tracking-tight text-ink">VOCA</span>
         </Link>
 

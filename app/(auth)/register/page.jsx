@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { LogoTile } from "@/components/Logo";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -34,11 +35,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <div className="mb-10">
           <div className="flex items-center gap-2.5 mb-8">
-            <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
-                <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
-              </svg>
-            </div>
+            <LogoTile className="h-9 w-9" markClassName="h-4 w-4" />
             <span className="font-display text-2xl font-extrabold tracking-tight text-ink">VOCA</span>
           </div>
           <h1 className="font-display text-4xl font-extrabold leading-tight tracking-tight text-ink">Create account</h1>

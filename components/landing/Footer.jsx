@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoTile } from "@/components/Logo";
 
 const PRODUCT = [
   { label: "Features", href: "#features" },
@@ -17,11 +18,7 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-accent text-white">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
-                <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
-              </svg>
-            </span>
+            <LogoTile />
             <span className="font-display text-lg font-extrabold tracking-tight text-ink">VOCA</span>
           </div>
           <p className="mt-4 text-sm text-muted max-w-xs">
