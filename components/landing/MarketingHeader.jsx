@@ -6,7 +6,6 @@ import ThemeToggle from "@/components/ThemeToggle";
 const LINKS = [
   { label: "Features", href: "#features" },
   { label: "How it works", href: "#journey" },
-  { label: "Pricing", href: "#pricing" },
 ];
 
 export default function MarketingHeader({ loggedIn }) {

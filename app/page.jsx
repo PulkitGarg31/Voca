@@ -5,7 +5,6 @@ import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
 import Comparison from "@/components/landing/Comparison";
 import Journey from "@/components/landing/Journey";
-import Pricing from "@/components/landing/Pricing";
 import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
 
@@ -19,7 +18,6 @@ export default async function Home() {
       <Features />
       <Comparison />
       <Journey />
-      <Pricing />
       <CTA loggedIn={loggedIn} />
       <Footer />
     </main>
