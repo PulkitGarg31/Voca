@@ -2,40 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap");
+/* Inter is loaded via next/font in app/layout.jsx (--font-inter); no @import needed. */
 
 /* ─── Theme tokens (RGB channels) ───────────────────────────── */
 :root {
-  --bg: 232 229 222;          /* #e8e5de page */
-  --surface: 240 237 230;     /* #f0ede6 cards */
-  --surface-2: 224 221 213;   /* inner panels */
-  --line: 214 211 204;        /* #d6d3cc borders */
-  --line-strong: 187 184 176; /* #bbb8b0 hover borders / decorative display */
-  --ink: 17 17 17;            /* #111 primary text */
-  --muted: 136 133 128;       /* #888580 secondary text */
-  --faint: 170 168 160;       /* #aaa8a0 tertiary text */
-  --ghost: 214 211 204;       /* ghost button bg */
-  --ghost-hover: 200 197 190; /* #c8c5be ghost hover */
-  --accent: 240 90 26;        /* #f05a1a */
-  --accent-hover: 217 78 16;  /* #d94e10 */
-  --cell-0: 219 216 209;      /* empty heatmap cell */
+  --bg: 245 247 250;            /* #F5F7FA page */
+  --surface: 255 255 255;       /* #FFFFFF cards */
+  --surface-2: 241 244 249;     /* #F1F4F9 inner panels */
+  --line: 226 232 240;          /* #E2E8F0 borders */
+  --line-strong: 203 213 225;   /* #CBD5E1 hover borders */
+  --ink: 15 27 45;              /* #0F1B2D primary text / navy */
+  --muted: 100 116 139;         /* #64748B secondary text */
+  --faint: 148 163 184;         /* #94A3B8 tertiary text */
+  --ghost: 241 244 249;         /* ghost/secondary button bg */
+  --ghost-hover: 226 232 240;   /* ghost hover */
+  --accent: 37 99 235;          /* #2563EB brand blue */
+  --accent-hover: 29 78 216;    /* #1D4ED8 */
+  --brand-navy: 15 27 45;       /* #0F1B2D primary pill button */
+  --brand-navy-hover: 30 41 59; /* #1E293B */
+  --sky-from: 219 234 254;      /* #DBEAFE hero gradient top */
+  --sky-to: 245 247 250;        /* fades into page */
+  --cell-0: 226 232 240;        /* empty heatmap cell */
   color-scheme: light;
 }
 
 .dark {
-  --bg: 26 24 21;
-  --surface: 38 35 31;
-  --surface-2: 47 43 38;
-  --line: 58 53 47;
-  --line-strong: 78 72 63;
-  --ink: 240 237 230;
-  --muted: 162 156 145;
-  --faint: 113 108 100;
-  --ghost: 54 50 45;
-  --ghost-hover: 68 64 57;
-  --accent: 240 90 26;
-  --accent-hover: 255 107 45;
-  --cell-0: 47 43 38;
+  --bg: 11 18 32;               /* #0B1220 */
+  --surface: 20 28 43;          /* #141C2B */
+  --surface-2: 27 37 54;        /* #1B2536 */
+  --line: 39 51 73;             /* #273349 */
+  --line-strong: 51 65 92;      /* #33415C */
+  --ink: 232 238 246;           /* #E8EEF6 */
+  --muted: 148 163 184;         /* #94A3B8 */
+  --faint: 100 116 139;         /* #64748B */
+  --ghost: 27 37 54;
+  --ghost-hover: 39 51 73;
+  --accent: 59 130 246;         /* #3B82F6 */
+  --accent-hover: 96 165 250;   /* #60A5FA */
+  --brand-navy: 59 130 246;     /* in dark, primary pill = accent blue */
+  --brand-navy-hover: 96 165 250;
+  --sky-from: 15 23 42;         /* #0F172A night sky */
+  --sky-to: 11 18 32;           /* #0B1220 */
+  --cell-0: 27 37 54;
   color-scheme: dark;
 }
 
@@ -44,12 +52,12 @@
   body {
     background-color: rgb(var(--bg));
     color: rgb(var(--ink));
-    font-family: "DM Sans", var(--font-inter), system-ui, sans-serif;
+    font-family: var(--font-inter), "system-ui", sans-serif;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
-  h1, h2, h3, .display {
-    font-family: "Bebas Neue", sans-serif;
-    letter-spacing: 0.02em;
+  h1, h2, h3 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 }
 
