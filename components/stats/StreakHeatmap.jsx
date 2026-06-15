@@ -3,16 +3,15 @@ import { useState, useMemo } from "react";
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-// Count ramp. 0 uses the theme's empty-cell token (adapts to light/dark);
-// the orange ramp reads well on both backgrounds.
+// Blue intensity ramp — reads well on both light and dark surfaces.
 function cellColor(count) {
   if (!count) return "rgb(var(--cell-0))";
-  if (count <= 2) return "#fdc99e";
-  if (count <= 5) return "#f9924e";
-  if (count <= 10) return "#f05a1a";
-  return "#c94710";
+  if (count <= 2) return "#bfdbfe"; // blue-200
+  if (count <= 5) return "#60a5fa"; // blue-400
+  if (count <= 10) return "#2563eb"; // blue-600
+  return "#1e3a8a"; // blue-900
 }
-const LEGEND = ["rgb(var(--cell-0))", "#fdc99e", "#f9924e", "#f05a1a", "#c94710"];
+const LEGEND = ["rgb(var(--cell-0))", "#bfdbfe", "#60a5fa", "#2563eb", "#1e3a8a"];
 
 // Build keys in UTC to match the server (/api/stats keys activity by
 // createdAt.toISOString(), i.e. UTC date). Keeps cells and counts aligned.
