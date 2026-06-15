@@ -19,19 +19,19 @@ export default function Navbar({ user }) {
 
   return (
     <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-5xl">
-      <div className="bg-ghost rounded-full px-5 py-2.5 flex items-center justify-between shadow-sm">
+      <div className="bg-surface/80 backdrop-blur border border-line rounded-full px-5 py-2.5 flex items-center justify-between shadow-sm">
         {/* Logo */}
         <Link href="/statistics" className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+          <div className="w-7 h-7 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
             <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24">
               <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
             </svg>
           </div>
-          <span className="font-display text-lg tracking-widest text-ink">VOCA</span>
+          <span className="font-display text-lg font-extrabold tracking-tight text-ink">VOCA</span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-0.5 bg-ghost-hover rounded-full p-1">
+        <nav className="hidden md:flex items-center gap-0.5 bg-surface-2 rounded-full p-1">
           {NAV.map((item) => (
             <Link
               key={item.href}
@@ -62,7 +62,7 @@ export default function Navbar({ user }) {
           </button>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden bg-accent text-white text-xs font-semibold px-4 py-2 rounded-full"
+            className="md:hidden bg-brand-navy text-white text-xs font-semibold px-4 py-2 rounded-full"
           >
             Menu
           </button>
