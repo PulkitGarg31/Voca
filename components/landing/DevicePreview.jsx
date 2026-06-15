@@ -9,7 +9,7 @@ export default function DevicePreview({ className = "" }) {
   return (
     <div className={`relative mx-auto w-[270px] ${className}`}>
       {/* glow under device */}
-      <div aria-hidden className="absolute -inset-6 -z-10 rounded-[3rem] bg-accent/20 blur-3xl" />
+      <div aria-hidden className="absolute -inset-4 -z-10 rounded-[3rem] bg-accent/15 blur-2xl" />
       <div className="rounded-[2.6rem] border-[7px] border-ink bg-ink p-1.5 shadow-2xl">
         <div className="relative overflow-hidden rounded-[2rem] bg-surface">
           {/* notch */}

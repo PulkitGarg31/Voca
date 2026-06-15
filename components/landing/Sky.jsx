@@ -1,86 +1,49 @@
-// Atmospheric sky background with SVG-generated fluffy clouds (no image assets),
-// a soft sun glow, faint grain texture, and a starfield in dark mode. Plus a
-// wavy cloud-edge divider used to blend sky bands into the flat sections.
+// Atmospheric sky background built entirely from CSS gradients — no SVG filters
+// (feTurbulence/feGaussianBlur) or image assets, so it composites on the GPU and
+// stays smooth while scrolling. Clouds are layered radial gradients whose centers
+// sit just below the band, so only their soft puffy tops show along the bottom.
 
-// One cumulus cloud: a flat base ellipse with overlapping bumps. Inherits `fill`
-// from the parent <g>; a gaussian blur on the group fuses the shapes into fluff.
-function Cloud({ cx, cy, s = 1 }) {
-  return (
-    <g transform={`translate(${cx} ${cy}) scale(${s})`}>
-      <ellipse cx="0" cy="22" rx="130" ry="34" />
-      <circle cx="-66" cy="6" r="34" />
-      <circle cx="-22" cy="-16" r="48" />
-      <circle cx="34" cy="-10" r="42" />
-      <circle cx="80" cy="8" r="32" />
-    </g>
-  );
-}
+const cloud = (rx, ry, x, y, c) =>
+  `radial-gradient(${rx}% ${ry}% at ${x}% ${y}%, ${c} 0%, rgba(255,255,255,0) 62%)`;
 
-const FAR = [
-  { cx: 240, cy: 150, s: 0.55 },
-  { cx: 760, cy: 110, s: 0.5 },
-  { cx: 1080, cy: 180, s: 0.6 },
-];
-const NEAR = [
-  { cx: 140, cy: 400, s: 1.15 },
-  { cx: 470, cy: 450, s: 1.5 },
-  { cx: 300, cy: 500, s: 1.7 },
-  { cx: 820, cy: 380, s: 1.05 },
-  { cx: 1080, cy: 460, s: 1.35 },
-];
+const LIGHT = [
+  // sun glow, top-right
+  "radial-gradient(60% 45% at 86% -8%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 55%)",
+  // front row of clouds (centers below the band)
+  cloud(52, 70, 12, 110, "#ffffff"),
+  cloud(46, 64, 32, 118, "#ffffff"),
+  cloud(58, 76, 52, 112, "#ffffff"),
+  cloud(46, 64, 72, 120, "#ffffff"),
+  cloud(52, 70, 90, 110, "#ffffff"),
+  // softer back row, higher up
+  cloud(30, 48, 22, 96, "rgba(255,255,255,0.8)"),
+  cloud(26, 44, 64, 92, "rgba(255,255,255,0.75)"),
+  // base sky
+  "linear-gradient(180deg, #eaf5ff 0%, #cbe6ff 46%, #9ecdf5 100%)",
+].join(",");
 
-export function SkyBackdrop({ id = "sky", className = "" }) {
-  const blur = `cloudblur-${id}`;
-  const grain = `grain-${id}`;
-  const stars = `stars-${id}`;
+const DARK = [
+  // faint moon glow
+  "radial-gradient(55% 40% at 84% -6%, rgba(120,160,220,0.18) 0%, rgba(120,160,220,0) 55%)",
+  // a sparse starfield (tiny dots)
+  "radial-gradient(1.5px 1.5px at 18% 14%, rgba(255,255,255,0.9), transparent)",
+  "radial-gradient(1.5px 1.5px at 42% 9%, rgba(255,255,255,0.8), transparent)",
+  "radial-gradient(1.2px 1.2px at 67% 16%, rgba(255,255,255,0.7), transparent)",
+  "radial-gradient(1.6px 1.6px at 83% 11%, rgba(255,255,255,0.85), transparent)",
+  "radial-gradient(1.2px 1.2px at 30% 22%, rgba(255,255,255,0.6), transparent)",
+  // faint clouds
+  cloud(54, 72, 16, 114, "rgba(150,180,220,0.10)"),
+  cloud(50, 66, 52, 118, "rgba(150,180,220,0.10)"),
+  cloud(52, 70, 88, 112, "rgba(150,180,220,0.09)"),
+  // base night sky
+  "linear-gradient(180deg, #070d1c 0%, #0a1530 50%, #0b1226 100%)",
+].join(",");
+
+export function SkyBackdrop({ className = "" }) {
   return (
     <div aria-hidden className={`absolute inset-0 overflow-hidden ${className}`}>
-      {/* gradient base: day sky → night sky */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#eaf5ff] via-[#cbe6ff] to-[#9ecdf5] dark:from-[#070d1c] dark:via-[#0a1530] dark:to-[#0b1226]" />
-      {/* sun glow (day) / moon glow (night) */}
-      <div className="absolute -top-28 right-[10%] h-80 w-80 rounded-full bg-white/70 blur-[90px] dark:bg-sky-300/10" />
-
-      <svg
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 1200 620"
-        preserveAspectRatio="xMidYMax slice"
-      >
-        <defs>
-          <filter id={blur} x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="11" />
-          </filter>
-          <filter id={grain}>
-            <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="11" stitchTiles="stitch" />
-            <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0" />
-          </filter>
-          <radialGradient id={stars} cx="50%" cy="20%" r="80%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        {/* fractal cloud texture for atmosphere */}
-        <rect width="1200" height="620" filter={`url(#${grain})`} className="opacity-[0.12] dark:opacity-[0.05]" />
-
-        {/* starfield (dark only) */}
-        <g className="hidden dark:block">
-          {[
-            [120, 90], [300, 60], [520, 120], [700, 70], [880, 110], [1040, 70],
-            [200, 170], [430, 200], [640, 180], [820, 220], [980, 180], [1120, 150],
-          ].map(([x, y], i) => (
-            <circle key={i} cx={x} cy={y} r={i % 3 === 0 ? 1.6 : 1} fill={`url(#${stars})`} />
-          ))}
-        </g>
-
-        {/* far, faint clouds for depth */}
-        <g filter={`url(#${blur})`} className="fill-white/55 dark:fill-slate-300/[0.05]">
-          {FAR.map((c, i) => <Cloud key={i} {...c} />)}
-        </g>
-        {/* near, bright clouds anchored to the bottom */}
-        <g filter={`url(#${blur})`} className="fill-white/95 dark:fill-slate-300/[0.07]">
-          {NEAR.map((c, i) => <Cloud key={i} {...c} />)}
-        </g>
-      </svg>
+      <div className="absolute inset-0 dark:hidden" style={{ backgroundImage: LIGHT }} />
+      <div className="absolute inset-0 hidden dark:block" style={{ backgroundImage: DARK }} />
     </div>
   );
 }
@@ -107,7 +70,6 @@ export function WaveDivider({ position = "bottom", fill = "fill-bg", className =
 
 // Sky band wrapper: atmospheric backdrop + optional wave dividers + content.
 export function SkySection({
-  id = "sky",
   children,
   className = "",
   waveTop = false,
@@ -117,7 +79,7 @@ export function SkySection({
 }) {
   return (
     <section className={`relative isolate overflow-hidden ${className}`}>
-      <SkyBackdrop id={id} />
+      <SkyBackdrop />
       {waveTop && <WaveDivider position="top" fill={waveTopFill} className="z-10" />}
       <div className="relative z-10">{children}</div>
       {waveBottom && <WaveDivider position="bottom" fill={waveBottomFill} className="z-10" />}

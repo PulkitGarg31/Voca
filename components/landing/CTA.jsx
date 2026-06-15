@@ -28,7 +28,7 @@ export default function CTA({ loggedIn }) {
             <Link href={loggedIn ? "/statistics" : "/register"} className="btn-primary inline-flex items-center gap-2 shadow-lg shadow-ink/10">
               {loggedIn ? "Go to dashboard" : "Start learning free"} <ArrowRight className="h-4 w-4" />
             </Link>
-            <a href="#features" className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/70 px-5 py-3 text-sm font-semibold text-ink shadow-sm backdrop-blur transition-all hover:bg-white dark:border-white/10 dark:bg-white/10">
+            <a href="#features" className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/90 px-5 py-3 text-sm font-semibold text-ink shadow-sm transition-all hover:bg-white dark:border-white/10 dark:bg-white/10">
               <Play className="h-4 w-4 text-accent" /> See features
             </a>
           </div>

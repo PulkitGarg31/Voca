@@ -19,7 +19,7 @@ export default function Navbar({ user }) {
 
   return (
     <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-5xl">
-      <div className="bg-surface/80 backdrop-blur border border-line rounded-full px-5 py-2.5 flex items-center justify-between shadow-sm">
+      <div className="bg-surface/95 border border-line rounded-full px-5 py-2.5 flex items-center justify-between shadow-sm">
         {/* Logo */}
         <Link href="/statistics" className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">

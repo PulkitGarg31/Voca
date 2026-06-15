@@ -8,7 +8,7 @@ export default function Hero({ loggedIn }) {
   return (
     <SkySection id="hero" className="pb-28 pt-32 md:pb-36" waveBottom waveBottomFill="fill-bg">
       <div className="mx-auto max-w-6xl px-4 text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/60 px-3.5 py-1.5 text-xs font-semibold text-ink/80 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/10 dark:text-ink/90">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/60 bg-white/80 px-3.5 py-1.5 text-xs font-semibold text-ink/80 shadow-sm dark:border-white/10 dark:bg-white/10 dark:text-ink/90">
           <Sparkle className="h-3.5 w-3.5 text-accent" /> AI-powered vocabulary learning
         </span>
         <h1 className="mx-auto mt-7 max-w-4xl font-display text-5xl font-extrabold leading-[1.02] tracking-tight text-ink md:text-7xl">
@@ -29,7 +29,7 @@ export default function Hero({ loggedIn }) {
               <Link href="/register" className="btn-primary inline-flex items-center gap-2 shadow-lg shadow-ink/10">
                 Start free <ArrowRight className="h-4 w-4" />
               </Link>
-              <a href="#features" className="rounded-full border border-white/60 bg-white/70 px-6 py-3 text-sm font-semibold text-ink shadow-sm backdrop-blur transition-all hover:bg-white dark:border-white/10 dark:bg-white/10">
+              <a href="#features" className="rounded-full border border-white/70 bg-white/90 px-6 py-3 text-sm font-semibold text-ink shadow-sm transition-all hover:bg-white dark:border-white/10 dark:bg-white/10">
                 See how it works
               </a>
             </>

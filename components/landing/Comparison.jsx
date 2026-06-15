@@ -41,7 +41,7 @@ export default function Comparison() {
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           {/* Old way */}
-          <div className="rounded-3xl border border-line/60 bg-surface/95 p-6 shadow-lg backdrop-blur md:p-7">
+          <div className="rounded-3xl border border-line/60 bg-surface p-6 shadow-lg md:p-7">
             <div className="flex items-center gap-3 border-b border-line pb-4">
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
                 <Book className="h-5 w-5" />

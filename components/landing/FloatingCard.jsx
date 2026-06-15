@@ -9,7 +9,7 @@ export default function FloatingCard({ icon: Icon, title, subtitle, className = 
       : "bg-accent/10 text-accent";
   return (
     <div
-      className={`absolute z-30 flex items-center gap-2.5 rounded-2xl border border-white/50 bg-white/70 px-3.5 py-2.5 shadow-xl backdrop-blur-md dark:border-white/10 dark:bg-white/[0.08] ${className}`}
+      className={`absolute z-30 flex items-center gap-2.5 rounded-2xl border border-white/60 bg-white/90 px-3.5 py-2.5 shadow-xl dark:border-white/10 dark:bg-[#101a2e]/95 ${className}`}
     >
       {Icon && (
         <span className={`inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${toneCls}`}>
