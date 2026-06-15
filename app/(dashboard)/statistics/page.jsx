@@ -59,7 +59,7 @@ export default function StatisticsPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <p className="section-label">Couldn&apos;t load statistics</p>
-        <p className="display text-[3rem] display-muted tracking-[0.05em]">TRY AGAIN</p>
+        <p className="font-display text-3xl font-extrabold tracking-tight text-ink">Couldn&apos;t load stats</p>
         <button onClick={() => location.reload()} className="btn-primary mt-2">Reload</button>
       </div>
     );
@@ -69,17 +69,19 @@ export default function StatisticsPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 pb-20">
       {/* Hero */}
-      <div className="pt-10 pb-10 border-b border-line">
+      <div className="pt-2 pb-8 border-b border-line">
         <p className="section-label mb-2">Learning statistics</p>
-        <div className="flex items-end justify-between">
-          <h1 className="display text-[7rem]">
-            {overall.totalWords}
-            <br />
-            <span className="display-muted">WORDS LEARNED</span>
-          </h1>
-          <div className="text-right pb-2">
-            <p className="font-display text-[3rem] leading-none text-accent">{overall.streak.current} DAYS</p>
-            <p className="section-label mt-1">Current streak</p>
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-ink">Your progress</h1>
+          <div className="flex gap-8">
+            <div>
+              <p className="font-display text-4xl font-extrabold leading-none text-ink">{overall.totalWords}</p>
+              <p className="section-label mt-1.5">Words learned</p>
+            </div>
+            <div>
+              <p className="font-display text-4xl font-extrabold leading-none text-accent">{overall.streak.current}</p>
+              <p className="section-label mt-1.5">Day streak</p>
+            </div>
           </div>
         </div>
       </div>

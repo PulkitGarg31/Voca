@@ -34,7 +34,7 @@ export default function Navbar({ user }) {
               key={item.href}
               href={item.href}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                path === item.href ? "bg-ink text-white" : "text-muted hover:text-ink"
+                path === item.href ? "bg-accent text-white" : "text-muted hover:text-ink"
               }`}
             >
               {item.label}
@@ -53,7 +53,7 @@ export default function Navbar({ user }) {
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="hidden md:block bg-ink hover:opacity-80 text-white text-xs font-semibold px-4 py-2 rounded-full transition-opacity"
+            className="hidden md:block bg-ghost hover:bg-ghost-hover text-ink text-xs font-semibold px-4 py-2 rounded-full transition-colors"
           >
             Sign out
           </button>
@@ -75,7 +75,7 @@ export default function Navbar({ user }) {
               href={item.href}
               onClick={() => setMenuOpen(false)}
               className={`px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                path === item.href ? "bg-ink text-white" : "text-muted hover:text-ink"
+                path === item.href ? "bg-accent text-white" : "text-muted hover:text-ink"
               }`}
             >
               {item.label}

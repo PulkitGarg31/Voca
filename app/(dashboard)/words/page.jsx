@@ -119,16 +119,14 @@ export default function WordsPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 pb-20">
       {/* Hero */}
-      <div className="pt-10 pb-10 border-b border-line flex items-end justify-between gap-4 flex-wrap">
+      <div className="pt-2 pb-6 border-b border-line flex items-end justify-between gap-4 flex-wrap">
         <div>
           <p className="section-label mb-2">My library</p>
-          <h1 className="display text-[7rem]">
-            {total}
-            <br />
-            <span className="display-muted">WORDS</span>
+          <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-ink">
+            {total} <span className="text-accent">{total === 1 ? "word" : "words"}</span>
           </h1>
         </div>
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <button className="btn-ghost text-xs py-2.5 px-4" onClick={() => setShowImport(true)}>Import</button>
           <button className="btn-ghost text-xs py-2.5 px-4" onClick={exportWords}>Export</button>
           <button className="btn-primary flex items-center gap-2" onClick={() => { setEditing(null); setShowAdd(true); }}>
@@ -144,7 +142,7 @@ export default function WordsPage() {
           <input type="text" placeholder="Search words…" className="input max-w-xs" value={search} onChange={(e) => setSearch(e.target.value)} />
           <div className="flex gap-1.5 flex-wrap items-center">
             {ALL_CATEGORIES.map((c) => (
-              <button key={c} onClick={() => setCategory(c)} className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${category === c ? "bg-ink text-white border-ink" : "border-line text-muted hover:border-ink hover:text-ink"}`}>
+              <button key={c} onClick={() => setCategory(c)} className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${category === c ? "bg-accent text-white border-accent" : "border-line text-muted hover:border-ink hover:text-ink"}`}>
                 {c}
               </button>
             ))}
@@ -180,7 +178,7 @@ export default function WordsPage() {
         ) : words.length === 0 ? (
           <div className="text-center py-24">
             <p className="section-label mb-3">{favoritesOnly ? "No favourites" : "Empty shelf"}</p>
-            <p className="display text-[3rem] display-muted tracking-[0.05em]">{noFilters ? "NO WORDS YET" : "NO MATCHES"}</p>
+            <p className="font-display text-2xl font-extrabold tracking-tight text-ink">{noFilters ? "No words yet" : "No matches"}</p>
             {noFilters && <button className="btn-primary mt-6" onClick={() => { setEditing(null); setShowAdd(true); }}>Add your first word</button>}
           </div>
         ) : (

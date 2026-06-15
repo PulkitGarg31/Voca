@@ -97,7 +97,7 @@ function Bubble({ msg, onAddWord }) {
         <div className="w-7 h-7 rounded-full bg-ink flex items-center justify-center text-white text-[10px] font-bold mr-2.5 flex-shrink-0 mt-0.5">V</div>
       )}
       <div className="flex flex-col gap-2 max-w-[78%]">
-        <div className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap rounded-2xl ${isUser ? "bg-ink text-white rounded-br-sm" : "bg-surface border border-line text-ink rounded-bl-sm"}`}>
+        <div className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap rounded-2xl ${isUser ? "bg-accent text-white rounded-br-sm" : "bg-surface border border-line text-ink rounded-bl-sm"}`}>
           {renderFormatted(msg.content)}
         </div>
         {words.length > 0 && (

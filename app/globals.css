@@ -102,7 +102,7 @@
     @apply flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-muted hover:text-ink hover:bg-surface-2 transition-colors;
   }
   .nav-item.active {
-    @apply bg-ink text-white;
+    @apply bg-accent text-white;
   }
   .scrollbar-thin::-webkit-scrollbar { width: 4px; }
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }

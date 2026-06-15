@@ -198,7 +198,7 @@ export default function PracticePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <p className="section-label">Nothing to practice</p>
-        <p className="display text-[3rem] display-muted tracking-[0.05em]">ADD WORDS FIRST</p>
+        <p className="font-display text-3xl font-extrabold tracking-tight text-ink">Add words first</p>
         <a href="/words" className="btn-primary mt-2">Go add words</a>
       </div>
     );
@@ -210,14 +210,14 @@ export default function PracticePage() {
       <div className="max-w-5xl mx-auto px-6 pb-20">
         <div className="pt-10 pb-10 border-b border-line">
           <p className="section-label mb-2">Practice</p>
-          <h1 className="display text-[7rem]">CHOOSE<br /><span className="display-muted">A MODE</span></h1>
+          <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-ink">Choose a mode</h1>
         </div>
 
         {/* Scope toggle */}
         <div className="pt-8 flex items-center gap-2">
           <button
             onClick={() => setScope("all")}
-            className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all ${scope === "all" ? "bg-ink text-white border-ink" : "border-line text-muted hover:text-ink hover:border-ink"}`}
+            className={`px-4 py-2 rounded-full text-xs font-semibold border transition-all ${scope === "all" ? "bg-accent text-white border-accent" : "border-line text-muted hover:text-ink hover:border-ink"}`}
           >
             All words ({allWords.length})
           </button>
@@ -262,7 +262,10 @@ export default function PracticePage() {
       <div className="max-w-5xl mx-auto px-6 pb-20">
         <div className="pt-10 pb-10 border-b border-line">
           <p className="section-label mb-2">Session complete</p>
-          <h1 className="display text-[7rem]">{pct}%<br /><span className="display-muted">ACCURACY</span></h1>
+          <div className="flex items-baseline gap-3">
+            <h1 className="font-display text-5xl md:text-6xl font-extrabold tracking-tight text-accent">{pct}%</h1>
+            <span className="font-display text-2xl font-bold tracking-tight text-muted">accuracy</span>
+          </div>
         </div>
         <div className="py-10 flex items-center gap-16 border-b border-line">
           <div>

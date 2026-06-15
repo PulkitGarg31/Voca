@@ -126,9 +126,9 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-6 pb-20">
-      <div className="pt-10 pb-10 border-b border-line">
+      <div className="pt-2 pb-8 border-b border-line">
         <p className="section-label mb-2">Account</p>
-        <h1 className="display text-[5rem]">SETTINGS</h1>
+        <h1 className="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-ink">Settings</h1>
       </div>
 
       {/* Profile */}
@@ -166,7 +166,7 @@ export default function SettingsPage() {
               <button
                 key={t}
                 onClick={() => setTheme(t)}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold capitalize transition-all ${mounted && theme === t ? "bg-ink text-white" : "text-muted hover:text-ink"}`}
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold capitalize transition-all ${mounted && theme === t ? "bg-accent text-white" : "text-muted hover:text-ink"}`}
               >
                 {t}
               </button>
