@@ -1,26 +1,6 @@
 import Link from "next/link";
 import { Check, ArrowRight, X } from "@/components/landing/Icons";
 
-// Sky-gradient band used by Hero and CTA. Gradient + faint cloud blobs are
-// driven by theme tokens so dark mode becomes a night sky automatically.
-export function SkyBand({ children, className = "" }) {
-  return (
-    <section
-      className={`relative overflow-hidden ${className}`}
-      style={{
-        background:
-          "linear-gradient(180deg, rgb(var(--sky-from)) 0%, rgb(var(--sky-to)) 100%)",
-      }}
-    >
-      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-60">
-        <div className="absolute -top-10 left-1/4 h-48 w-48 rounded-full bg-white/40 blur-3xl dark:bg-white/5" />
-        <div className="absolute top-20 right-1/4 h-56 w-56 rounded-full bg-white/30 blur-3xl dark:bg-white/5" />
-      </div>
-      <div className="relative">{children}</div>
-    </section>
-  );
-}
-
 // Eyebrow label: blue uppercase text with an optional leading icon.
 export function SectionLabel({ icon: Icon, children }) {
   return (

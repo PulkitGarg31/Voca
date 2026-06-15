@@ -43,3 +43,9 @@ export const Search = (p) => (
 export const Flame = (p) => (
   <svg {...base} {...p}><path d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c0-1 0-2-1-3 3 1 5 4 5 7a6 6 0 0 1-12 0c0-4 4-5 6-11Z" /></svg>
 );
+export const Book = (p) => (
+  <svg {...base} {...p}><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM18 19H6" /></svg>
+);
+export const Play = (p) => (
+  <svg {...base} {...p}><circle cx="12" cy="12" r="9" /><path d="M10 9l5 3-5 3z" /></svg>
+);

@@ -1,36 +1,88 @@
-import { CheckRow } from "@/components/landing/primitives";
+import { SkySection } from "@/components/landing/Sky";
+import { Check, X, Book, Sparkle } from "@/components/landing/Icons";
 
-const OLD = ["Static, one-size word lists", "Cram, then forget", "No feedback on usage", "Same path for everyone", "Manual, easy-to-skip review"];
-const NEW = ["Adaptive spaced repetition", "Remember for the long term", "AI feedback, examples & mnemonics", "Personalized to your own words", "Reviews auto-scheduled, 24/7"];
+// Each row compares one dimension: the old way (red) vs the VOCA way (blue).
+const ROWS = [
+  { label: "Time to fluency", old: "2–3 years", neo: "Weeks, not years" },
+  { label: "Personalization", old: "One-size-fits-all", neo: "Adapts every session" },
+  { label: "Practice", old: "Limited, scheduled", neo: "Unlimited, anytime" },
+  { label: "Availability", old: "Fixed class times", neo: "24/7, any device" },
+  { label: "Cost", old: "$$$ courses", neo: "Free to start" },
+  { label: "Feedback", old: "Delayed, generic", neo: "Instant, AI-powered" },
+];
+
+function Pill({ children, negative }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
+        negative ? "bg-red-500/10 text-red-500" : "bg-accent/10 text-accent"
+      }`}
+    >
+      {negative ? <X className="h-3 w-3" /> : <Check className="h-3 w-3" />}
+      {children}
+    </span>
+  );
+}
 
 export default function Comparison() {
   return (
-    <section className="bg-accent text-white">
-      <div className="mx-auto max-w-6xl px-4 py-20">
+    <SkySection id="difference" className="py-28 md:py-32" waveTop waveTopFill="fill-bg" waveBottom waveBottomFill="fill-bg">
+      <div className="mx-auto max-w-6xl px-4">
         <div className="max-w-2xl">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">The difference</span>
-          <h2 className="mt-4 font-display text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
-            Rote memorization vs. <br className="hidden sm:block" /> the VOCA way
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/60">The difference</span>
+          <h2 className="mt-4 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink md:text-5xl">
+            Rote memorization vs.
+            <br className="hidden sm:block" /> the <span className="text-accent">VOCA way</span>
           </h2>
-          <p className="mt-4 text-white/80 max-w-md">
+          <p className="mt-4 max-w-md text-ink/70">
             Traditional study is slow and forgettable. VOCA flips the script with AI and a scheduler built around how memory actually works.
           </p>
         </div>
+
         <div className="mt-12 grid gap-6 md:grid-cols-2">
-          <div className="rounded-3xl bg-surface p-7">
-            <h3 className="text-lg font-bold text-ink">The old way</h3>
-            <ul className="mt-4">
-              {OLD.map((t) => <CheckRow key={t} negative>{t}</CheckRow>)}
-            </ul>
+          {/* Old way */}
+          <div className="rounded-3xl border border-line/60 bg-surface/95 p-6 shadow-lg backdrop-blur md:p-7">
+            <div className="flex items-center gap-3 border-b border-line pb-4">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
+                <Book className="h-5 w-5" />
+              </span>
+              <div>
+                <h3 className="text-base font-bold text-ink">Traditional study</h3>
+                <p className="text-xs text-muted">Textbooks, classes, apps</p>
+              </div>
+            </div>
+            <dl>
+              {ROWS.map((r) => (
+                <div key={r.label} className="flex items-center justify-between border-b border-line/60 py-3.5 last:border-0">
+                  <dt className="text-sm text-muted">{r.label}</dt>
+                  <dd><Pill negative>{r.old}</Pill></dd>
+                </div>
+              ))}
+            </dl>
           </div>
-          <div className="rounded-3xl bg-surface p-7 shadow-lg">
-            <h3 className="text-lg font-bold text-accent">The VOCA way</h3>
-            <ul className="mt-4">
-              {NEW.map((t) => <CheckRow key={t}>{t}</CheckRow>)}
-            </ul>
+
+          {/* VOCA way */}
+          <div className="rounded-3xl border-2 border-accent/30 bg-surface p-6 shadow-2xl md:p-7">
+            <div className="flex items-center gap-3 border-b border-line pb-4">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-white">
+                <Sparkle className="h-5 w-5" />
+              </span>
+              <div>
+                <h3 className="text-base font-bold text-accent">VOCA</h3>
+                <p className="text-xs text-muted">AI-powered, adaptive</p>
+              </div>
+            </div>
+            <dl>
+              {ROWS.map((r) => (
+                <div key={r.label} className="flex items-center justify-between border-b border-line/60 py-3.5 last:border-0">
+                  <dt className="text-sm text-ink">{r.label}</dt>
+                  <dd><Pill>{r.neo}</Pill></dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
       </div>
-    </section>
+    </SkySection>
   );
 }

@@ -23,7 +23,7 @@ const PLANS = (yearly) => [
 export default function Pricing() {
   const [yearly, setYearly] = useState(false);
   return (
-    <section id="pricing" className="bg-surface-2/40">
+    <section id="pricing" className="bg-bg">
       <div className="mx-auto max-w-6xl px-4 py-20">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-xl">

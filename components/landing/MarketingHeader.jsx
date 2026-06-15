@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const LINKS = [
   { label: "Features", href: "#features" },
@@ -31,6 +32,7 @@ export default function MarketingHeader({ loggedIn }) {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
           {loggedIn ? (
             <Link href="/statistics" className="btn-primary">Go to dashboard</Link>
           ) : (
@@ -41,7 +43,10 @@ export default function MarketingHeader({ loggedIn }) {
           )}
         </div>
 
-        <button onClick={() => setOpen((v) => !v)} className="md:hidden btn-ghost px-4 py-2">Menu</button>
+        <div className="md:hidden flex items-center gap-2">
+          <ThemeToggle />
+          <button onClick={() => setOpen((v) => !v)} className="btn-ghost px-4 py-2">Menu</button>
+        </div>
       </div>
 
       {open && (
