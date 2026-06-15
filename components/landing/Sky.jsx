@@ -26,7 +26,7 @@ export function SkyBackdrop({ className = "" }) {
       <div className="absolute inset-0 dark:hidden" style={{ backgroundImage: LIGHT }} />
       <div className="absolute inset-0 hidden dark:block" style={{ backgroundImage: DARK }} />
       {/* pre-rendered fluffy clouds, anchored to the bottom */}
-      <div className="absolute inset-0 bg-[url('/sky-clouds.png')] bg-[length:100%_auto] bg-bottom bg-no-repeat opacity-95 dark:opacity-[0.12]" />
+      <div className="absolute inset-0 bg-[url('/sky-clouds.png')] bg-cover bg-bottom bg-no-repeat opacity-95 dark:opacity-[0.12]" />
     </div>
   );
 }
