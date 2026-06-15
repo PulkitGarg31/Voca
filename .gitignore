@@ -23,3 +23,6 @@ yarn-error.log*
 .vercel
 
 CLAUDE.md
+# Design source mockups
+Frontend Design.webp
+*.webp
