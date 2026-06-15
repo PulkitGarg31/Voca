@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Check, ArrowRight, X } from "@/components/landing/Icons";
 
 // Sky-gradient band used by Hero and CTA. Gradient + faint cloud blobs are
@@ -90,14 +91,14 @@ export function PlanCard({ name, tagline, price, period, features, cta, href, hi
         <span className={`text-4xl font-extrabold ${highlighted ? "text-white" : "text-ink"}`}>{price}</span>
         <span className={`mb-1 text-sm ${highlighted ? "text-white/60" : "text-muted"}`}>{period}</span>
       </div>
-      <a
+      <Link
         href={href}
         className={`text-center text-sm font-semibold px-6 py-3 rounded-full transition-all ${
           highlighted ? "bg-white text-ink hover:bg-white/90" : "btn-ghost"
         }`}
       >
         {cta}
-      </a>
+      </Link>
       <ul className="flex flex-col gap-3">
         {features.map((f) => (
           <li key={f} className="flex items-center gap-3 text-sm">
