@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import MarketingHeader from "@/components/landing/MarketingHeader";
 import Hero from "@/components/landing/Hero";
-import LogoCloud from "@/components/landing/LogoCloud";
 import Features from "@/components/landing/Features";
 import Comparison from "@/components/landing/Comparison";
 import Journey from "@/components/landing/Journey";
@@ -17,7 +16,6 @@ export default async function Home() {
     <main className="relative">
       <MarketingHeader loggedIn={loggedIn} />
       <Hero loggedIn={loggedIn} />
-      <LogoCloud />
       <Features />
       <Comparison />
       <Journey />
