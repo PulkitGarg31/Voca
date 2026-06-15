@@ -243,7 +243,7 @@ export default function PracticePage() {
                 <div className="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center mb-4 group-hover:bg-accent group-hover:text-white transition-colors">
                   {m.icon}
                 </div>
-                <p className="font-display text-2xl tracking-wide text-ink">{m.title}</p>
+                <p className="font-display text-2xl font-bold tracking-tight text-ink">{m.title}</p>
                 <p className="text-sm text-muted mt-1">{m.blurb}</p>
                 {locked && <p className="text-[11px] text-faint mt-3">Needs at least {m.minWords} {scope === "due" ? "due " : ""}words</p>}
               </button>
@@ -266,12 +266,12 @@ export default function PracticePage() {
         </div>
         <div className="py-10 flex items-center gap-16 border-b border-line">
           <div>
-            <p className="font-display text-[4rem] leading-none text-accent">{score.correct}</p>
+            <p className="font-display text-6xl font-extrabold leading-none text-accent">{score.correct}</p>
             <p className="section-label mt-1">Correct</p>
           </div>
           <div className="w-px h-14 bg-line" />
           <div>
-            <p className="font-display text-[4rem] leading-none display-muted">{score.incorrect}</p>
+            <p className="font-display text-6xl font-extrabold leading-none display-muted">{score.incorrect}</p>
             <p className="section-label mt-1">Incorrect</p>
           </div>
         </div>
@@ -307,7 +307,7 @@ export default function PracticePage() {
           <div className="mt-10 panel p-14 text-center cursor-pointer hover:border-line-strong transition-all min-h-64 flex flex-col items-center justify-center" onClick={() => setFlipped(!flipped)}>
             {!flipped ? (
               <>
-                <p className="font-display text-[5rem] leading-none tracking-[0.03em] text-ink uppercase">{w.word}</p>
+                <p className="font-display text-6xl font-extrabold leading-none tracking-tight text-ink uppercase">{w.word}</p>
                 {w.phonetic && <p className="text-faint text-sm mt-2">{w.phonetic}</p>}
                 <p className="section-label mt-8">Tap or press Space to reveal</p>
               </>

@@ -93,7 +93,7 @@ export default function WordOfDay({ onAdded }) {
         {/* Word + definition */}
         <div className="flex-1 px-6 py-5 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
-            <h3 className="font-display text-[2.75rem] leading-none tracking-wide text-ink capitalize">{data.word}</h3>
+            <h3 className="font-display text-4xl font-extrabold leading-tight tracking-tight text-ink capitalize">{data.word}</h3>
             {data.details?.phonetic && <span className="text-sm text-faint">{data.details.phonetic}</span>}
             {data.details?.audioUrl && (
               <button onClick={() => playAudio(data.details.audioUrl)} className="text-accent hover:text-accent-hover transition-colors" title="Play pronunciation">

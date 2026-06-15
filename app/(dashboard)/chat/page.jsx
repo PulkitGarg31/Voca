@@ -188,7 +188,7 @@ export default function ChatPage() {
       <div className="pt-8 pb-5 border-b border-line flex items-end justify-between flex-shrink-0">
         <div>
           <p className="section-label mb-2">AI assistant</p>
-          <h1 className="font-display text-[3.5rem] leading-none tracking-[0.05em] text-ink">VOCA AI</h1>
+          <h1 className="font-display text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-ink">VOCA AI</h1>
           <p className="text-xs text-faint mt-1">Powered by Gemini · LangChain · Persistent history</p>
         </div>
         <div className="flex items-center gap-2 mb-2">
