@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { schedule, isDue, isCorrectAnswer } from "@/lib/srs";
 import { playWord } from "@/lib/audio";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -49,7 +50,6 @@ const MODES = [
 
 const defOf = (w) => w?.meanings?.[0]?.definitions?.[0]?.definition || "No definition available";
 const posOf = (w) => w?.meanings?.[0]?.partOfSpeech || "";
-const norm = (s) => String(s || "").trim().toLowerCase().replace(/[^a-z\s']/g, "");
 
 export default function PracticePage() {
   const [allWords, setAllWords] = useState([]);
@@ -68,14 +68,10 @@ export default function PracticePage() {
   const [typed, setTyped] = useState("");
   const [checked, setChecked] = useState(false);
 
-  // Pronunciation mode
-  const [speechSupported, setSpeechSupported] = useState(false);
-  const [recording, setRecording] = useState(false);
-  const [heard, setHeard] = useState("");
-  const [pronCorrect, setPronCorrect] = useState(false);
+  // Pronunciation mode — shared speech-recognition hook (also used on word cards).
+  const speech = useSpeechRecognition();
 
   const quizTimer = useRef(null);
-  const recognitionRef = useRef(null);
 
   useEffect(() => {
     fetch("/api/words")
@@ -85,17 +81,7 @@ export default function PracticePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Detect speech recognition after mount (avoids SSR/hydration mismatch).
-  useEffect(() => {
-    setSpeechSupported(
-      typeof window !== "undefined" && Boolean(window.SpeechRecognition || window.webkitSpeechRecognition)
-    );
-  }, []);
-
-  useEffect(() => () => {
-    clearTimeout(quizTimer.current);
-    try { recognitionRef.current?.abort(); } catch {}
-  }, []);
+  useEffect(() => () => clearTimeout(quizTimer.current), []);
 
   const dueWords = useMemo(() => allWords.filter((w) => isDue(w)), [allWords]);
 
@@ -113,13 +99,11 @@ export default function PracticePage() {
     setPicked(null);
     setTyped("");
     setChecked(false);
-    setHeard("");
-    setRecording(false);
-    setPronCorrect(false);
+    speech.reset();
   }
 
   function startMode(key, customPool = null) {
-    try { recognitionRef.current?.abort(); } catch {}
+    speech.reset();
     const pool = customPool || (scope === "due" ? dueWords : allWords);
     setMode(key);
     setDeck(smartOrder(pool));
@@ -132,7 +116,7 @@ export default function PracticePage() {
 
   function resetToModes() {
     clearTimeout(quizTimer.current);
-    try { recognitionRef.current?.abort(); } catch {}
+    speech.reset();
     setMode(null);
     setDone(false);
   }
@@ -211,31 +195,6 @@ export default function PracticePage() {
     quizTimer.current = setTimeout(() => record(wasCorrect), 1100);
   }
 
-  function startPronunciation() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR || recording) return;
-    const target = norm(deck[idx].word);
-    const rec = new SR();
-    rec.lang = "en-US";
-    rec.interimResults = false;
-    rec.maxAlternatives = 5;
-    rec.onresult = (e) => {
-      const alts = Array.from(e.results[0] || []).map((r) => norm(r.transcript));
-      setHeard(alts[0] || "");
-      const ok = alts.some((a) => a === target || a.split(/\s+/).includes(target));
-      setPronCorrect(ok);
-      setChecked(true);
-    };
-    rec.onerror = () => setRecording(false);
-    rec.onend = () => setRecording(false);
-    recognitionRef.current = rec;
-    setHeard("");
-    setChecked(false);
-    setPronCorrect(false);
-    setRecording(true);
-    try { rec.start(); } catch { setRecording(false); }
-  }
-
   // Keyboard shortcuts while practising.
   useEffect(() => {
     if (!mode || done) return;
@@ -278,7 +237,7 @@ export default function PracticePage() {
   // ─── Mode select ───
   if (!mode) {
     const pool = scope === "due" ? dueWords : allWords;
-    const modes = MODES.filter((m) => m.key !== "pronunciation" || speechSupported);
+    const modes = MODES.filter((m) => m.key !== "pronunciation" || speech.supported);
     return (
       <div className="max-w-5xl mx-auto px-6 pb-20">
         <div className="pt-10 pb-10 border-b border-line">
@@ -323,7 +282,7 @@ export default function PracticePage() {
             );
           })}
         </div>
-        {!speechSupported && (
+        {!speech.supported && (
           <p className="text-[11px] text-faint mt-4">Tip: the Pronunciation mode needs a browser with speech recognition (Chrome, Edge, or Safari).</p>
         )}
       </div>
@@ -497,33 +456,33 @@ export default function PracticePage() {
           <div className="mt-10 panel p-10 text-center min-h-48 flex flex-col items-center justify-center">
             {posOf(w) && <p className="section-label mb-3 text-accent">{posOf(w)}</p>}
             <p className="text-xl text-ink leading-relaxed max-w-lg">{defOf(w)}</p>
-            {!checked ? (
+            {!speech.result ? (
               <>
                 <p className="section-label mt-6">Say the word out loud</p>
                 <button
-                  onClick={startPronunciation}
-                  disabled={recording}
-                  className={`mt-5 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${recording ? "bg-red-500/10 text-red-500 border-2 border-red-500 animate-pulse" : "btn-primary"}`}
+                  onClick={() => speech.listen(w.word)}
+                  disabled={speech.listening}
+                  className={`mt-5 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${speech.listening ? "bg-red-500/10 text-red-500 border-2 border-red-500 animate-pulse" : "btn-primary"}`}
                 >
                   <MicIcon className="w-4 h-4" />
-                  {recording ? "Listening…" : "Record & speak"}
+                  {speech.listening ? "Listening…" : "Record & speak"}
                 </button>
               </>
             ) : (
               <div className="mt-6">
-                <p className={`text-sm font-semibold ${pronCorrect ? "text-emerald-600 dark:text-emerald-400" : "text-red-500"}`}>
-                  {pronCorrect ? "Correct! 🎉" : <>Answer: <span className="capitalize">{w.word}</span></>}
+                <p className={`text-sm font-semibold ${speech.result.correct ? "text-emerald-600 dark:text-emerald-400" : "text-red-500"}`}>
+                  {speech.result.correct ? "Correct! 🎉" : <>Answer: <span className="capitalize">{w.word}</span></>}
                 </p>
-                {heard && <p className="text-xs text-faint mt-1">Heard: &ldquo;{heard}&rdquo;</p>}
+                {speech.result.heard && <p className="text-xs text-faint mt-1">Heard: &ldquo;{speech.result.heard}&rdquo;</p>}
                 <button onClick={() => playWord(w.audioUrl, w.word)} className="mt-3 inline-flex items-center gap-2 text-sm text-accent hover:text-accent-hover transition-colors">
                   <SpeakerIcon className="w-4 h-4" /> Hear it
                 </button>
               </div>
             )}
           </div>
-          {checked && (
+          {speech.result && (
             <div className="mt-6 max-w-md mx-auto">
-              <button onClick={() => record(pronCorrect)} className="btn-primary w-full">Next</button>
+              <button onClick={() => record(speech.result.correct)} className="btn-primary w-full">Next</button>
             </div>
           )}
         </>

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { catStyle } from "@/lib/categories";
 import { playWord } from "@/lib/audio";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import FormattedText from "@/components/FormattedText";
 
 export default function WordCard({ word, onDelete, onToggleFav, onEdit }) {
@@ -10,6 +11,7 @@ export default function WordCard({ word, onDelete, onToggleFav, onEdit }) {
   const def = word.meanings?.[0]?.definitions?.[0];
   const pos = word.meanings?.[0]?.partOfSpeech;
   const cat = catStyle(word.category);
+  const pron = useSpeechRecognition();
 
   async function getAiHelp() {
     if (ai.loading || ai.text) return;
@@ -45,6 +47,16 @@ export default function WordCard({ word, onDelete, onToggleFav, onEdit }) {
           </div>
 
           {def && <p className="text-xs text-muted mt-1 line-clamp-2">{def.definition}</p>}
+
+          {(pron.listening || pron.result) && (
+            <p className={`mt-1.5 text-xs font-semibold ${pron.listening ? "text-faint" : pron.result.correct ? "text-emerald-600 dark:text-emerald-400" : "text-red-500"}`}>
+              {pron.listening
+                ? "Listening… say the word"
+                : pron.result.correct
+                  ? "✓ Correct!"
+                  : <>✗ heard: &ldquo;{pron.result.heard || "—"}&rdquo;</>}
+            </p>
+          )}
 
           {expanded && (
             <div className="mt-3 space-y-2 text-xs">
@@ -109,6 +121,17 @@ export default function WordCard({ word, onDelete, onToggleFav, onEdit }) {
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 010 7.07" />
             </svg>
           </button>
+          {pron.supported && (
+            <button
+              onClick={() => (pron.result ? pron.reset() : pron.listen(word.word))}
+              className={`p-1.5 rounded-lg transition-colors ${pron.listening ? "text-red-500 animate-pulse" : "text-faint hover:bg-surface-2 hover:text-ink"}`}
+              title="Say it &amp; check your pronunciation"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
+              </svg>
+            </button>
+          )}
           <button
             onClick={() => onToggleFav(!word.isFavorite)}
             className={`p-1.5 rounded-lg hover:bg-surface-2 transition-colors ${word.isFavorite ? "text-amber-400" : "text-faint hover:text-amber-400"}`}
