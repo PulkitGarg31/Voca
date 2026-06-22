@@ -1,15 +1,8 @@
 "use client";
 import { useState } from "react";
 import { catStyle } from "@/lib/categories";
+import { playWord } from "@/lib/audio";
 import FormattedText from "@/components/FormattedText";
-
-function playAudio(url) {
-  if (!url) return;
-  const src = url.startsWith("//") ? `https:${url}` : url;
-  try {
-    new Audio(src).play().catch(() => {});
-  } catch {}
-}
 
 export default function WordCard({ word, onDelete, onToggleFav, onEdit }) {
   const [expanded, setExpanded] = useState(false);
@@ -40,7 +33,7 @@ export default function WordCard({ word, onDelete, onToggleFav, onEdit }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-sm font-semibold text-ink capitalize">{word.word}</h3>
+            <h3 className="font-display text-base font-semibold text-ink capitalize">{word.word}</h3>
             {word.phonetic && <span className="text-xs text-faint">{word.phonetic}</span>}
             {pos && <span className="text-[10px] text-faint italic">{pos}</span>}
             <span className={`badge ${cat.badge}`}>{word.category}</span>
@@ -107,17 +100,15 @@ export default function WordCard({ word, onDelete, onToggleFav, onEdit }) {
 
         {/* Actions */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          {word.audioUrl && (
-            <button
-              onClick={() => playAudio(word.audioUrl)}
-              className="p-1.5 rounded-lg hover:bg-surface-2 text-faint hover:text-ink transition-colors"
-              title="Play pronunciation"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 010 7.07" />
-              </svg>
-            </button>
-          )}
+          <button
+            onClick={() => playWord(word.audioUrl, word.word)}
+            className="p-1.5 rounded-lg hover:bg-surface-2 text-faint hover:text-ink transition-colors"
+            title="Play pronunciation"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 010 7.07" />
+            </svg>
+          </button>
           <button
             onClick={() => onToggleFav(!word.isFavorite)}
             className={`p-1.5 rounded-lg hover:bg-surface-2 transition-colors ${word.isFavorite ? "text-amber-400" : "text-faint hover:text-amber-400"}`}

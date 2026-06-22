@@ -2,14 +2,7 @@
 import { useState, useEffect } from "react";
 import { CATEGORIES } from "@/lib/categories";
 import { useDictionary } from "@/hooks/useDictionary";
-
-function playAudio(url) {
-  if (!url) return;
-  const src = url.startsWith("//") ? `https:${url}` : url;
-  try {
-    new Audio(src).play().catch(() => {});
-  } catch {}
-}
+import { playWord } from "@/lib/audio";
 
 export default function AddWordModal({ onClose, onSaved, editWord = null }) {
   const isEdit = Boolean(editWord);
@@ -91,7 +84,7 @@ export default function AddWordModal({ onClose, onSaved, editWord = null }) {
       <div role="dialog" aria-modal="true" aria-labelledby="addword-title" className="bg-surface rounded-2xl w-full max-w-md shadow-2xl border border-line" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-line">
-          <h2 id="addword-title" className="text-sm font-semibold text-ink">{isEdit ? "Edit word" : "Add new word"}</h2>
+          <h2 id="addword-title" className="font-display text-base font-semibold text-ink">{isEdit ? "Edit word" : "Add new word"}</h2>
           <button onClick={onClose} className="text-faint hover:text-ink transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
@@ -123,13 +116,11 @@ export default function AddWordModal({ onClose, onSaved, editWord = null }) {
               <div className="flex items-center gap-2 mb-2">
                 <p className="text-sm font-semibold text-accent capitalize">{lookupData.word}</p>
                 {lookupData.phonetic && <span className="text-xs text-accent/80">{lookupData.phonetic}</span>}
-                {lookupData.audioUrl && (
-                  <button onClick={() => playAudio(lookupData.audioUrl)} className="text-accent hover:text-accent-hover transition-colors">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 010 7.07" />
-                    </svg>
-                  </button>
-                )}
+                <button onClick={() => playWord(lookupData.audioUrl, lookupData.word)} className="text-accent hover:text-accent-hover transition-colors" title="Play pronunciation">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 010 7.07" />
+                  </svg>
+                </button>
               </div>
               {lookupData.meanings?.slice(0, 2).map((m, i) => (
                 <div key={i} className="mb-1.5">
@@ -150,7 +141,7 @@ export default function AddWordModal({ onClose, onSaved, editWord = null }) {
                   onClick={() => setCategory(c)}
                   className={`px-3 py-1 rounded-lg text-xs border transition-all ${
                     category === c
-                      ? "bg-ink text-white border-ink"
+                      ? "bg-ink text-[rgb(var(--on-primary))] border-ink"
                       : "bg-surface-2 border-line text-muted hover:text-ink hover:border-line-strong"
                   }`}
                 >

@@ -10,7 +10,7 @@ const PracticeSessionSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["flashcard", "quiz", "spelling"],
+      enum: ["flashcard", "quiz", "spelling", "pronunciation"],
       required: true,
     },
     wordsReviewed: [{ type: mongoose.Schema.Types.ObjectId, ref: "Word" }],

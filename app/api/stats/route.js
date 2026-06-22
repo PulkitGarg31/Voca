@@ -49,7 +49,6 @@ export async function GET() {
     weekAgo.setDate(weekAgo.getDate() - 7);
     const weeklyWords = words.filter((w) => w.createdAt >= weekAgo).length;
     const weeklySessions = sessions.filter((s) => s.date >= weekAgo);
-    const weeklyTime = weeklySessions.reduce((a, s) => a + (s.duration || 0), 0);
 
     // Recent words (last 5)
     const recentWords = words.slice(0, 5);
@@ -70,7 +69,6 @@ export async function GET() {
     return NextResponse.json({
       overall: {
         totalWords: words.length,
-        totalTime: user.stats.totalTimeSpent,
         streak: user.streak,
         dueCount,
       },
@@ -83,7 +81,6 @@ export async function GET() {
       },
       weekly: {
         words: weeklyWords,
-        time: weeklyTime,
         sessions: weeklySessions.length,
         avgWordsPerDay: Math.round((weeklyWords / 7) * 10) / 10,
       },

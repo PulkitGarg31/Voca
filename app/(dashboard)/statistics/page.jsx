@@ -3,6 +3,7 @@ import StreakHeatmap from "@/components/stats/StreakHeatmap";
 import CategoryBreakdown from "@/components/stats/CategoryBreakdown";
 import RecentActivity from "@/components/stats/RecentActivity";
 import WordOfDay from "@/components/WordOfDay";
+import IdiomOfDay from "@/components/IdiomOfDay";
 import { useStats } from "@/hooks/useStats";
 
 function StatCard({ icon, iconBg, value, label }) {
@@ -15,15 +16,6 @@ function StatCard({ icon, iconBg, value, label }) {
       </div>
     </div>
   );
-}
-
-function fmtTime(secs) {
-  if (!secs) return "0m";
-  if (secs < 60) return `${secs}s`;
-  const h = Math.floor(secs / 3600);
-  const m = Math.round((secs % 3600) / 60);
-  if (h) return `${h}h ${m}m`;
-  return `${m}m`;
 }
 
 function Ring({ value, max }) {
@@ -119,26 +111,21 @@ export default function StatisticsPage() {
         </div>
       )}
 
-      {/* Word of the day */}
-      <div className="py-10 border-b border-line">
+      {/* Word & idiom of the day */}
+      <div className="py-10 border-b border-line space-y-3">
         <WordOfDay onAdded={refetch} />
+        <IdiomOfDay onAdded={refetch} />
       </div>
 
       {/* Overall stats */}
       <div className="py-10 border-b border-line">
         <p className="section-label mb-5">Overall</p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <StatCard
             iconBg="bg-accent/10"
             icon={<svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" /></svg>}
             value={overall.totalWords}
             label="Words learned"
-          />
-          <StatCard
-            iconBg="bg-ink/10"
-            icon={<svg className="w-4 h-4 text-ink" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>}
-            value={fmtTime(overall.totalTime)}
-            label="Time spent"
           />
           <StatCard
             iconBg="bg-accent/10"
@@ -161,18 +148,12 @@ export default function StatisticsPage() {
           <p className="section-label">This week</p>
           <span className="text-xs text-faint">Last 7 days</span>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <StatCard
             iconBg="bg-accent/10"
             icon={<svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" /></svg>}
             value={weekly.words}
             label="Words added"
-          />
-          <StatCard
-            iconBg="bg-ink/10"
-            icon={<svg className="w-4 h-4 text-ink" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>}
-            value={fmtTime(weekly.time)}
-            label="Time this week"
           />
           <StatCard
             iconBg="bg-accent/10"

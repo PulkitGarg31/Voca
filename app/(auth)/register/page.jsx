@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthShell from "@/components/auth/AuthShell";
@@ -10,6 +10,21 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Prefill from a failed sign-in for an unregistered email (see login page).
+  // Read once, then clear so the credentials don't linger in sessionStorage.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("voca_prefill");
+      if (raw) {
+        const { email, password } = JSON.parse(raw);
+        setForm((f) => ({ ...f, email: email || "", password: password || "" }));
+        sessionStorage.removeItem("voca_prefill");
+      }
+    } catch (e) {
+      console.warn("Could not read prefill credentials:", e);
+    }
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();

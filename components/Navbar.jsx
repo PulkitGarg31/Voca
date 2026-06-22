@@ -34,7 +34,7 @@ export default function Navbar({ user }) {
               key={item.href}
               href={item.href}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                path === item.href ? "bg-accent text-white" : "text-muted hover:text-ink"
+                path === item.href ? "bg-accent text-[rgb(var(--on-primary))]" : "text-muted hover:text-ink"
               }`}
             >
               {item.label}
@@ -46,7 +46,7 @@ export default function Navbar({ user }) {
         <div className="flex items-center gap-2">
           <ThemeToggle className="hidden md:flex" />
           <div className="hidden md:flex items-center gap-2 bg-ghost-hover rounded-full px-3 py-1.5">
-            <div className="w-5 h-5 rounded-full bg-ink flex items-center justify-center text-[9px] text-white font-bold">
+            <div className="w-5 h-5 rounded-full bg-ink flex items-center justify-center text-[9px] text-[rgb(var(--on-primary))] font-bold">
               {user?.name?.[0]?.toUpperCase() || "U"}
             </div>
             <span className="text-xs font-medium text-ink/80">{user?.name?.split(" ")[0]}</span>
@@ -59,7 +59,7 @@ export default function Navbar({ user }) {
           </button>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden bg-brand-navy text-white text-xs font-semibold px-4 py-2 rounded-full"
+            className="md:hidden bg-brand-navy hover:bg-brand-navy-hover text-[rgb(var(--on-primary))] text-xs font-semibold px-4 py-2 rounded-full transition-colors"
           >
             Menu
           </button>
@@ -75,7 +75,7 @@ export default function Navbar({ user }) {
               href={item.href}
               onClick={() => setMenuOpen(false)}
               className={`px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                path === item.href ? "bg-accent text-white" : "text-muted hover:text-ink"
+                path === item.href ? "bg-accent text-[rgb(var(--on-primary))]" : "text-muted hover:text-ink"
               }`}
             >
               {item.label}

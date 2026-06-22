@@ -86,7 +86,7 @@ export function FeedbackProvider({ children }) {
               className="bg-surface border border-line rounded-2xl w-full max-w-sm shadow-2xl p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 id="confirm-title" className="text-base font-semibold text-ink">{dialog.opts.title || "Are you sure?"}</h3>
+              <h3 id="confirm-title" className="font-display text-lg font-semibold text-ink">{dialog.opts.title || "Are you sure?"}</h3>
               {dialog.opts.message && <p className="text-sm text-muted mt-2">{dialog.opts.message}</p>}
               <div className="flex gap-2 mt-6 justify-end">
                 <button autoFocus onClick={() => closeDialog(false)} className="btn-ghost py-2 px-4 text-xs">
@@ -94,8 +94,10 @@ export function FeedbackProvider({ children }) {
                 </button>
                 <button
                   onClick={() => closeDialog(true)}
-                  className={`py-2 px-4 text-xs font-semibold rounded-full text-white transition-colors ${
-                    dialog.opts.danger ? "bg-red-500 hover:bg-red-600" : "bg-accent hover:bg-accent-hover"
+                  className={`py-2 px-4 text-xs font-semibold rounded-full transition-colors ${
+                    dialog.opts.danger
+                      ? "bg-red-500 hover:bg-red-600 text-white"
+                      : "bg-accent hover:bg-accent-hover text-[rgb(var(--on-primary))]"
                   }`}
                 >
                   {dialog.opts.confirmLabel || "Confirm"}

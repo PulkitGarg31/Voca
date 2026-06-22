@@ -11,26 +11,26 @@ export function SectionLabel({ icon: Icon, children }) {
   );
 }
 
-// Two-tone heading: first line in ink, second line in accent blue.
+// Two-tone heading: first line in ink, second line as an italic gold accent.
 export function TwoToneHeading({ top, accent, className = "" }) {
   return (
     <h2 className={`font-display text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-ink ${className}`}>
       {top} <br className="hidden sm:block" />
-      <span className="text-accent">{accent}</span>
+      <span className="italic font-light text-accent">{accent}</span>
     </h2>
   );
 }
 
 export function FeatureCard({ icon: Icon, title, children }) {
   return (
-    <div className="panel p-6 flex flex-col gap-4 hover:shadow-md hover:border-line-strong transition-all">
-      <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 text-accent">
+    <div className="group panel p-6 flex flex-col gap-4 hover:shadow-md hover:border-line-strong transition-all">
+      <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-accent/10 text-accent">
         <Icon className="h-5 w-5" />
       </span>
-      <h3 className="text-lg font-bold text-ink">{title}</h3>
+      <h3 className="font-display text-lg font-bold text-ink">{title}</h3>
       <p className="text-sm text-muted leading-relaxed flex-1">{children}</p>
-      <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
-        Learn more <ArrowRight className="h-4 w-4" />
+      <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent group-hover:text-accent-hover transition-colors">
+        Learn more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
       </span>
     </div>
   );
@@ -53,28 +53,29 @@ export function CheckRow({ children, negative = false }) {
 }
 
 export function PlanCard({ name, tagline, price, period, features, cta, href, highlighted = false }) {
+  const onFill = "text-[rgb(var(--on-primary))]";
   return (
     <div
       className={`rounded-3xl p-7 flex flex-col gap-6 border transition-all ${
         highlighted
-          ? "bg-ink text-white border-ink shadow-lg scale-[1.02]"
+          ? `bg-brand-navy ${onFill} border-brand-navy shadow-lg scale-[1.02]`
           : "bg-surface border-line shadow-sm"
       }`}
     >
       <div>
-        <p className={`text-xs font-semibold uppercase tracking-widest ${highlighted ? "text-white/60" : "text-muted"}`}>
+        <p className={`text-xs font-semibold uppercase tracking-widest ${highlighted ? `${onFill} opacity-70` : "text-muted"}`}>
           {name}
         </p>
-        <h3 className={`mt-1 text-xl font-bold ${highlighted ? "text-white" : "text-accent"}`}>{tagline}</h3>
+        <h3 className={`mt-1 font-display text-xl font-bold ${highlighted ? onFill : "text-accent"}`}>{tagline}</h3>
       </div>
       <div className="flex items-end gap-1">
-        <span className={`text-4xl font-extrabold ${highlighted ? "text-white" : "text-ink"}`}>{price}</span>
-        <span className={`mb-1 text-sm ${highlighted ? "text-white/60" : "text-muted"}`}>{period}</span>
+        <span className={`font-display text-4xl font-extrabold ${highlighted ? onFill : "text-ink"}`}>{price}</span>
+        <span className={`mb-1 text-sm ${highlighted ? `${onFill} opacity-70` : "text-muted"}`}>{period}</span>
       </div>
       <Link
         href={href}
         className={`text-center text-sm font-semibold px-6 py-3 rounded-full transition-all ${
-          highlighted ? "bg-white text-ink hover:bg-white/90" : "btn-ghost"
+          highlighted ? "bg-surface text-ink hover:bg-surface-2" : "btn-ghost"
         }`}
       >
         {cta}
@@ -82,8 +83,8 @@ export function PlanCard({ name, tagline, price, period, features, cta, href, hi
       <ul className="flex flex-col gap-3">
         {features.map((f) => (
           <li key={f} className="flex items-center gap-3 text-sm">
-            <Check className={`h-4 w-4 flex-shrink-0 ${highlighted ? "text-white" : "text-accent"}`} />
-            <span className={highlighted ? "text-white/90" : "text-ink"}>{f}</span>
+            <Check className={`h-4 w-4 flex-shrink-0 ${highlighted ? onFill : "text-accent"}`} />
+            <span className={highlighted ? `${onFill} opacity-90` : "text-ink"}>{f}</span>
           </li>
         ))}
       </ul>

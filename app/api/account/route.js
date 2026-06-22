@@ -5,7 +5,8 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import Word from "@/models/Word";
 import PracticeSession from "@/models/PracticeSession";
-import { clearChatHistory } from "@/lib/langchain";
+import ChatConversation from "@/models/ChatConversation";
+import { deleteHistories } from "@/lib/langchain";
 
 // GET /api/account — current user's profile + preferences
 export async function GET() {
@@ -69,15 +70,21 @@ export async function DELETE() {
     await connectDB();
     const userId = session.user.id;
 
+    // Collect this user's conversation ids before deleting the metadata, so we
+    // can clear their messages from the separate native-driver collection.
+    const convos = await ChatConversation.find({ userId }).select("conversationId").lean();
+    const sessionIds = [...new Set([userId, ...convos.map((c) => c.conversationId)])];
+
     await Promise.all([
       Word.deleteMany({ userId }),
       PracticeSession.deleteMany({ userId }),
+      ChatConversation.deleteMany({ userId }),
       User.findByIdAndDelete(userId),
     ]);
 
-    // Chat history lives in a separate native-driver collection.
+    // Chat messages live in a separate native-driver collection.
     try {
-      await clearChatHistory(userId);
+      await deleteHistories(sessionIds);
     } catch (e) {
       console.error("Failed to clear chat history on delete:", e);
     }

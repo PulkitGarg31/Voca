@@ -2,17 +2,19 @@
 import { useState, useEffect } from "react";
 import { playWord } from "@/lib/audio";
 
-export default function WordOfDay({ onAdded }) {
+// "Idiom of the day" card — mirrors WordOfDay. The idiom carries its own meaning
+// and example; "Add to library" stores it as a Word with partOfSpeech "idiom".
+export default function IdiomOfDay({ onAdded }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("idle"); // idle | loading | added | exists | error
 
   useEffect(() => {
     let ignore = false;
-    fetch("/api/word-of-the-day")
+    fetch("/api/idiom-of-the-day")
       .then((r) => r.json())
       .then((d) => {
-        if (ignore || !d?.word) return;
+        if (ignore || !d?.idiom) return;
         setData(d);
         if (d.alreadyAdded) setStatus("exists");
       })
@@ -29,10 +31,13 @@ export default function WordOfDay({ onAdded }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          word: data.word,
-          phonetic: data.details?.phonetic || "",
-          audioUrl: data.details?.audioUrl || "",
-          meanings: data.details?.meanings || [],
+          word: data.idiom,
+          meanings: [
+            {
+              partOfSpeech: "idiom",
+              definitions: [{ definition: data.meaning, example: data.example }],
+            },
+          ],
           category: "Other",
         }),
       });
@@ -54,9 +59,6 @@ export default function WordOfDay({ onAdded }) {
 
   if (!data) return null; // failed to load — quietly omit the card
 
-  const def = data.details?.meanings?.[0]?.definitions?.[0];
-  const pos = data.details?.meanings?.[0]?.partOfSpeech;
-
   const btn = {
     idle: { label: "Add to library", cls: "btn-primary", disabled: false },
     loading: { label: "Adding…", cls: "btn-primary", disabled: true },
@@ -71,7 +73,7 @@ export default function WordOfDay({ onAdded }) {
         {/* Accent rail / label */}
         <div className="bg-accent/10 border-b md:border-b-0 md:border-r border-line px-6 py-5 md:w-56 flex md:flex-col items-center md:items-start justify-between gap-2 flex-shrink-0">
           <div>
-            <p className="section-label text-accent">Word of the day</p>
+            <p className="section-label text-accent">Idiom of the day</p>
             <p className="text-xs text-faint mt-1">
               {new Date(`${data.date}T00:00:00Z`).toLocaleDateString("en-US", {
                 weekday: "long", month: "short", day: "numeric",
@@ -79,29 +81,22 @@ export default function WordOfDay({ onAdded }) {
             </p>
           </div>
           <svg className="w-10 h-10 text-accent/40" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-            <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         </div>
 
-        {/* Word + definition */}
+        {/* Idiom + meaning */}
         <div className="flex-1 px-6 py-5 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
-            <h3 className="font-display text-4xl font-extrabold leading-tight tracking-tight text-ink capitalize">{data.word}</h3>
-            {data.details?.phonetic && <span className="text-sm text-faint">{data.details.phonetic}</span>}
-            <button onClick={() => playWord(data.details?.audioUrl, data.word)} className="text-accent hover:text-accent-hover transition-colors" title="Play pronunciation">
+            <h3 className="font-display text-3xl font-extrabold leading-tight tracking-tight text-ink">&ldquo;{data.idiom}&rdquo;</h3>
+            <button onClick={() => playWord(null, data.idiom)} className="text-accent hover:text-accent-hover transition-colors" title="Listen">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M15.54 8.46a5 5 0 010 7.07" /></svg>
             </button>
-            {pos && <span className="font-display text-sm text-muted italic">{pos}</span>}
+            <span className="font-display text-sm text-muted italic">idiom</span>
           </div>
 
-          {def ? (
-            <>
-              <p className="text-sm text-muted mt-2 leading-relaxed">{def.definition}</p>
-              {def.example && <p className="font-display text-sm text-faint italic mt-1.5">&ldquo;{def.example}&rdquo;</p>}
-            </>
-          ) : (
-            <p className="text-sm text-faint mt-2">Definition unavailable right now — add it and look it up later.</p>
-          )}
+          <p className="text-sm text-muted mt-2 leading-relaxed">{data.meaning}</p>
+          {data.example && <p className="font-display text-sm text-faint italic mt-1.5">&ldquo;{data.example}&rdquo;</p>}
 
           <div className="mt-4">
             <button onClick={add} disabled={btn.disabled} className={`${btn.cls} text-xs py-2 px-5`}>

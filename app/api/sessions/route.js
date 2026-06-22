@@ -6,7 +6,7 @@ import PracticeSession from "@/models/PracticeSession";
 import User from "@/models/User";
 import { rateLimited } from "@/lib/rateLimit";
 
-const TYPES = ["flashcard", "quiz", "spelling"];
+const TYPES = ["flashcard", "quiz", "spelling", "pronunciation"];
 
 // POST /api/sessions — record a completed practice session
 export async function POST(req) {
@@ -23,8 +23,6 @@ export async function POST(req) {
     const wordsReviewed = (Array.isArray(body.wordsReviewed) ? body.wordsReviewed : []).slice(0, 500);
     const wordsCount = Math.max(0, Math.min(500, Number(body.wordsCount) || wordsReviewed.length));
     const correctCount = Math.max(0, Math.min(wordsCount, Number(body.correctCount) || 0));
-    // Duration is in seconds; clamp to a sane range (0–3h).
-    const duration = Math.max(0, Math.min(10800, Number(body.duration) || 0));
 
     if (wordsCount <= 0) {
       return NextResponse.json({ error: "An empty session can't be saved" }, { status: 400 });
@@ -42,12 +40,10 @@ export async function POST(req) {
       wordsReviewed,
       wordsCount,
       correctCount,
-      duration,
     });
 
     // Update aggregate user stats + streak (practice counts as activity).
     user.stats.totalPracticeSessions += 1;
-    user.stats.totalTimeSpent += duration;
     user.updateStreak();
     await user.save();
 

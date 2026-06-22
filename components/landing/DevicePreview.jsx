@@ -10,10 +10,10 @@ export default function DevicePreview({ className = "" }) {
     <div className={`relative mx-auto w-[270px] ${className}`}>
       {/* glow under device */}
       <div aria-hidden className="absolute -inset-4 -z-10 rounded-[3rem] bg-accent/15 blur-2xl" />
-      <div className="rounded-[2.6rem] border-[7px] border-ink bg-ink p-1.5 shadow-2xl">
+      <div className="rounded-[2.6rem] border-[7px] border-ink bg-ink p-1.5 shadow-2xl dark:border-line-strong dark:bg-surface-2">
         <div className="relative overflow-hidden rounded-[2rem] bg-surface">
           {/* notch */}
-          <div className="absolute left-1/2 top-2 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-ink" />
+          <div className="absolute left-1/2 top-2 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-ink dark:bg-bg" />
           <div className="space-y-3.5 px-4 pb-5 pt-9">
             {/* header */}
             <div className="flex items-center justify-between">
@@ -65,7 +65,7 @@ export default function DevicePreview({ className = "" }) {
             {/* chips */}
             <div className="flex gap-1.5">
               {["Daily", "Work", "Travel"].map((c, i) => (
-                <span key={c} className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${i === 0 ? "bg-ink text-white" : "bg-surface-2 text-muted"}`}>{c}</span>
+                <span key={c} className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${i === 0 ? "bg-accent text-[rgb(var(--on-primary))]" : "bg-surface-2 text-muted"}`}>{c}</span>
               ))}
             </div>
           </div>

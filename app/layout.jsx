@@ -1,4 +1,4 @@
-import { Inter, Bricolage_Grotesque } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import { themeInitScript } from "@/components/ThemeProvider";
@@ -7,9 +7,12 @@ import { validateEnv } from "@/lib/env";
 validateEnv();
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const display = Bricolage_Grotesque({
+// Fraunces — a literary "old-style" serif — drives all display type. Italic is
+// loaded for accent words (e.g. the "Voca" wordmark).
+const display = Fraunces({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-display",
 });
 

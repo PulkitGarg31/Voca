@@ -7,6 +7,7 @@ import Comparison from "@/components/landing/Comparison";
 import Journey from "@/components/landing/Journey";
 import CTA from "@/components/landing/CTA";
 import Footer from "@/components/landing/Footer";
+import Reveal from "@/components/Reveal";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -14,11 +15,12 @@ export default async function Home() {
   return (
     <main className="relative">
       <MarketingHeader loggedIn={loggedIn} />
+      {/* Hero is above the fold — render it immediately. The rest reveal on scroll. */}
       <Hero loggedIn={loggedIn} />
-      <Features />
-      <Comparison />
-      <Journey />
-      <CTA loggedIn={loggedIn} />
+      <Reveal><Features /></Reveal>
+      <Reveal><Comparison /></Reveal>
+      <Reveal><Journey /></Reveal>
+      <Reveal><CTA loggedIn={loggedIn} /></Reveal>
       <Footer />
     </main>
   );

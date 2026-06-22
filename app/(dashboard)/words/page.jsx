@@ -142,7 +142,7 @@ export default function WordsPage() {
           <input type="text" placeholder="Search words…" className="input max-w-xs" value={search} onChange={(e) => setSearch(e.target.value)} />
           <div className="flex gap-1.5 flex-wrap items-center">
             {ALL_CATEGORIES.map((c) => (
-              <button key={c} onClick={() => setCategory(c)} className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${category === c ? "bg-accent text-white border-accent" : "border-line text-muted hover:border-ink hover:text-ink"}`}>
+              <button key={c} onClick={() => setCategory(c)} className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${category === c ? "bg-accent text-[rgb(var(--on-primary))] border-accent" : "border-line text-muted hover:border-ink hover:text-ink"}`}>
                 {c}
               </button>
             ))}
@@ -155,7 +155,7 @@ export default function WordsPage() {
         <div className="flex gap-3 flex-wrap items-center">
           <div className="flex gap-1.5">
             {MASTERY_FILTERS.map((m) => (
-              <button key={m.value} onClick={() => setMastery(m.value)} className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${mastery === m.value ? "bg-accent text-white border-accent" : "border-line text-muted hover:border-accent hover:text-ink"}`}>
+              <button key={m.value} onClick={() => setMastery(m.value)} className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${mastery === m.value ? "bg-accent text-[rgb(var(--on-primary))] border-accent" : "border-line text-muted hover:border-accent hover:text-ink"}`}>
                 {m.label}
               </button>
             ))}

@@ -69,7 +69,7 @@ export default function BulkImportModal({ onClose, onDone }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-labelledby="import-title" className="bg-surface border border-line rounded-2xl w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-line">
-          <h2 id="import-title" className="text-sm font-semibold text-ink">Import words</h2>
+          <h2 id="import-title" className="font-display text-base font-semibold text-ink">Import words</h2>
           <button onClick={onClose} className="text-faint hover:text-ink transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
@@ -97,7 +97,7 @@ export default function BulkImportModal({ onClose, onDone }) {
                   key={c}
                   disabled={running}
                   onClick={() => setCategory(c)}
-                  className={`px-3 py-1 rounded-lg text-xs border transition-all ${category === c ? "bg-ink text-white border-ink" : "bg-surface-2 border-line text-muted hover:text-ink hover:border-line-strong"}`}
+                  className={`px-3 py-1 rounded-lg text-xs border transition-all ${category === c ? "bg-ink text-[rgb(var(--on-primary))] border-ink" : "bg-surface-2 border-line text-muted hover:text-ink hover:border-line-strong"}`}
                 >
                   {c}
                 </button>

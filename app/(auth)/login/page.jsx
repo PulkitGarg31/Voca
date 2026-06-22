@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthShell from "@/components/auth/AuthShell";
 import PasswordInput from "@/components/auth/PasswordInput";
+import { NO_ACCOUNT_ERROR } from "@/lib/authErrors";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,8 +33,23 @@ export default function LoginPage() {
     setLoading(true);
     const res = await signIn("credentials", { email: form.email, password: form.password, redirect: false });
     setLoading(false);
-    if (res?.error) setError("Invalid email or password");
-    else router.push("/statistics");
+    if (res?.error === NO_ACCOUNT_ERROR) {
+      // No account for this email — carry the entered credentials to the register
+      // page via sessionStorage (kept out of the URL/history) and prefill them there.
+      try {
+        sessionStorage.setItem(
+          "voca_prefill",
+          JSON.stringify({ email: form.email, password: form.password })
+        );
+      } catch (e) {
+        console.warn("Could not stash prefill credentials:", e);
+      }
+      router.push("/register");
+    } else if (res?.error) {
+      setError("Invalid email or password");
+    } else {
+      router.push("/statistics");
+    }
   }
 
   return (

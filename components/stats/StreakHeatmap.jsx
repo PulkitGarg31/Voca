@@ -3,15 +3,16 @@ import { useState, useMemo } from "react";
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-// Blue intensity ramp — reads well on both light and dark surfaces.
+// Warm gold → deep bronze intensity ramp — reads well on both the warm ivory
+// (Editorial) and charcoal (Noir) surfaces while staying in the accent family.
 function cellColor(count) {
   if (!count) return "rgb(var(--cell-0))";
-  if (count <= 2) return "#bfdbfe"; // blue-200
-  if (count <= 5) return "#60a5fa"; // blue-400
-  if (count <= 10) return "#2563eb"; // blue-600
-  return "#1e3a8a"; // blue-900
+  if (count <= 2) return "#E8CF96"; // pale gold
+  if (count <= 5) return "#D4A84E"; // gold
+  if (count <= 10) return "#A87C2E"; // bronze
+  return "#6E5320"; // deep bronze
 }
-const LEGEND = ["rgb(var(--cell-0))", "#bfdbfe", "#60a5fa", "#2563eb", "#1e3a8a"];
+const LEGEND = ["rgb(var(--cell-0))", "#E8CF96", "#D4A84E", "#A87C2E", "#6E5320"];
 
 // Build keys in UTC to match the server (/api/stats keys activity by
 // createdAt.toISOString(), i.e. UTC date). Keeps cells and counts aligned.

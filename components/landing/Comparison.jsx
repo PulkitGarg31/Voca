@@ -29,12 +29,12 @@ export default function Comparison() {
     <SkySection id="difference" className="py-28 md:py-32" waveTop waveTopFill="fill-bg" waveBottom waveBottomFill="fill-bg">
       <div className="mx-auto max-w-6xl px-4">
         <div className="max-w-2xl">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/60">The difference</span>
+          <span className="section-label">The difference</span>
           <h2 className="mt-4 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink md:text-5xl">
             Rote memorization vs.
-            <br className="hidden sm:block" /> the <span className="text-accent">VOCA way</span>
+            <br className="hidden sm:block" /> the <span className="italic font-light text-accent">VOCA way</span>
           </h2>
-          <p className="mt-4 max-w-md text-ink/70">
+          <p className="mt-4 max-w-md text-muted">
             Traditional study is slow and forgettable. VOCA flips the script with AI and a scheduler built around how memory actually works.
           </p>
         </div>
@@ -47,7 +47,7 @@ export default function Comparison() {
                 <Book className="h-5 w-5" />
               </span>
               <div>
-                <h3 className="text-base font-bold text-ink">Traditional study</h3>
+                <h3 className="font-display text-base font-bold text-ink">Traditional study</h3>
                 <p className="text-xs text-muted">Textbooks, classes, apps</p>
               </div>
             </div>
@@ -62,13 +62,13 @@ export default function Comparison() {
           </div>
 
           {/* VOCA way */}
-          <div className="rounded-3xl border-2 border-accent/30 bg-surface p-6 shadow-2xl md:p-7">
+          <div className="rounded-3xl border-2 border-accent/40 bg-surface p-6 shadow-2xl md:p-7">
             <div className="flex items-center gap-3 border-b border-line pb-4">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-white">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-[rgb(var(--on-primary))]">
                 <Sparkle className="h-5 w-5" />
               </span>
               <div>
-                <h3 className="text-base font-bold text-accent">VOCA</h3>
+                <h3 className="font-display text-base font-bold text-accent">VOCA</h3>
                 <p className="text-xs text-muted">AI-powered, adaptive</p>
               </div>
             </div>

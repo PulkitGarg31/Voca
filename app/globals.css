@@ -5,45 +5,52 @@
 /* Inter is loaded via next/font in app/layout.jsx (--font-inter); no @import needed. */
 
 /* ─── Theme tokens (RGB channels) ───────────────────────────── */
+/* "Editorial Noir" — a warm, literary identity.
+   Light ("Editorial"): warm ivory paper, near-black ink, deep bronze accent.
+   Dark ("Noir"): ink-charcoal paper, warm off-white text, restrained gold accent.
+   --on-primary is the text colour that sits ON the primary/accent fill, so each
+   theme keeps legible buttons (off-white on ink in light, near-black on gold in dark). */
 :root {
-  --bg: 245 247 250;            /* #F5F7FA page */
-  --surface: 255 255 255;       /* #FFFFFF cards */
-  --surface-2: 241 244 249;     /* #F1F4F9 inner panels */
-  --line: 226 232 240;          /* #E2E8F0 borders */
-  --line-strong: 203 213 225;   /* #CBD5E1 hover borders */
-  --ink: 15 27 45;              /* #0F1B2D primary text / navy */
-  --muted: 100 116 139;         /* #64748B secondary text */
-  --faint: 148 163 184;         /* #94A3B8 tertiary text */
-  --ghost: 241 244 249;         /* ghost/secondary button bg */
-  --ghost-hover: 226 232 240;   /* ghost hover */
-  --accent: 37 99 235;          /* #2563EB brand blue */
-  --accent-hover: 29 78 216;    /* #1D4ED8 */
-  --brand-navy: 15 27 45;       /* #0F1B2D primary pill button */
-  --brand-navy-hover: 30 41 59; /* #1E293B */
-  --sky-from: 219 234 254;      /* #DBEAFE hero gradient top */
-  --sky-to: 245 247 250;        /* fades into page */
-  --cell-0: 226 232 240;        /* empty heatmap cell */
+  --bg: 246 242 234;            /* #F6F2EA warm ivory paper */
+  --surface: 255 253 248;       /* #FFFDF8 cards */
+  --surface-2: 239 233 221;     /* #EFE9DD inner panels */
+  --line: 227 220 205;          /* #E3DCCD borders */
+  --line-strong: 211 201 181;   /* #D3C9B5 hover borders */
+  --ink: 33 28 21;              /* #211C15 primary text — warm near-black */
+  --muted: 93 86 72;            /* #5D5648 secondary text */
+  --faint: 139 130 112;         /* #8B8270 tertiary text */
+  --ghost: 239 233 221;         /* ghost/secondary button bg */
+  --ghost-hover: 230 222 205;   /* #E6DECD ghost hover */
+  --accent: 138 109 47;         /* #8A6D2F deep bronze (AA on paper) */
+  --accent-hover: 112 88 36;    /* #705824 */
+  --brand-navy: 33 28 21;       /* #211C15 deep ink — primary pill button */
+  --brand-navy-hover: 51 44 33; /* #332C21 */
+  --on-primary: 255 253 248;    /* off-white text on the ink primary button */
+  --sky-from: 247 240 226;      /* #F7F0E2 hero gradient top — warm highlight */
+  --sky-to: 246 242 234;        /* fades into page */
+  --cell-0: 233 226 210;        /* #E9E2D2 empty heatmap cell */
   color-scheme: light;
 }
 
 .dark {
-  --bg: 11 18 32;               /* #0B1220 */
-  --surface: 20 28 43;          /* #141C2B */
-  --surface-2: 27 37 54;        /* #1B2536 */
-  --line: 39 51 73;             /* #273349 */
-  --line-strong: 51 65 92;      /* #33415C */
-  --ink: 232 238 246;           /* #E8EEF6 */
-  --muted: 148 163 184;         /* #94A3B8 */
-  --faint: 100 116 139;         /* #64748B */
-  --ghost: 27 37 54;
-  --ghost-hover: 39 51 73;
-  --accent: 59 130 246;         /* #3B82F6 */
-  --accent-hover: 96 165 250;   /* #60A5FA */
-  --brand-navy: 59 130 246;     /* in dark, primary pill = accent blue */
-  --brand-navy-hover: 96 165 250;
-  --sky-from: 15 23 42;         /* #0F172A night sky */
-  --sky-to: 11 18 32;           /* #0B1220 */
-  --cell-0: 27 37 54;
+  --bg: 16 14 20;               /* #100E14 ink-charcoal night */
+  --surface: 26 24 34;          /* #1A1822 */
+  --surface-2: 35 32 44;        /* #23202C */
+  --line: 46 42 56;             /* #2E2A38 */
+  --line-strong: 58 53 71;      /* #3A3547 */
+  --ink: 236 232 241;           /* #ECE8F1 warm off-white */
+  --muted: 169 163 182;         /* #A9A3B6 */
+  --faint: 110 104 125;         /* #6E687D */
+  --ghost: 35 32 44;
+  --ghost-hover: 46 42 56;
+  --accent: 220 180 106;        /* #DCB46A restrained gold */
+  --accent-hover: 231 201 138;  /* #E7C98A */
+  --brand-navy: 220 180 106;    /* in dark, primary pill = gold */
+  --brand-navy-hover: 231 201 138;
+  --on-primary: 26 18 6;        /* #1A1206 near-black text on the gold button */
+  --sky-from: 26 22 40;         /* #1A1628 night highlight */
+  --sky-to: 16 14 20;           /* #100E14 */
+  --cell-0: 35 32 44;
   color-scheme: dark;
 }
 
@@ -56,18 +63,18 @@
     transition: background-color 0.2s ease, color 0.2s ease;
   }
   h1, h2, h3 {
-    font-family: var(--font-display), var(--font-inter), system-ui, sans-serif;
+    font-family: var(--font-display), Georgia, serif;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-brand-navy hover:bg-brand-navy-hover active:scale-95 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply bg-brand-navy hover:bg-brand-navy-hover active:scale-95 text-[rgb(var(--on-primary))] text-sm font-semibold px-6 py-3 rounded-full transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .btn-accent {
-    @apply bg-accent hover:bg-accent-hover active:scale-95 text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply bg-accent hover:bg-accent-hover active:scale-95 text-[rgb(var(--on-primary))] text-sm font-semibold px-6 py-3 rounded-full transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .btn-ghost {
     @apply bg-ghost hover:bg-ghost-hover text-ink text-sm font-semibold px-6 py-3 rounded-full transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed;
@@ -102,9 +109,31 @@
     @apply flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-muted hover:text-ink hover:bg-surface-2 transition-colors;
   }
   .nav-item.active {
-    @apply bg-accent text-white;
+    @apply bg-accent text-[rgb(var(--on-primary))];
   }
   .scrollbar-thin::-webkit-scrollbar { width: 4px; }
   .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background: rgb(var(--line)); border-radius: 99px; }
+}
+
+/* ─── Scroll reveal (landing) ───────────────────────────────── */
+/* Sections fade + rise as they scroll into view. The .reveal-in class is
+   toggled by the <Reveal> client component via IntersectionObserver. */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  will-change: opacity, transform;
+}
+.reveal.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.reveal-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

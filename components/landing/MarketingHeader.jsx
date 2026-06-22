@@ -16,12 +16,14 @@ export default function MarketingHeader({ loggedIn }) {
       <div className="mx-auto max-w-6xl px-4 py-5 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5">
           <LogoTile />
-          <span className="font-display text-lg font-extrabold tracking-tight text-ink">VOCA</span>
+          <span className="font-display text-lg font-extrabold tracking-tight text-ink">
+            Vo<span className="italic text-accent">ca</span>
+          </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-1 rounded-full border border-line bg-surface/60 px-1.5 py-1 backdrop-blur">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm font-medium text-muted hover:text-ink transition-colors">
+            <a key={l.href} href={l.href} className="rounded-full px-3.5 py-1.5 text-sm font-medium text-muted hover:bg-surface-2 hover:text-ink transition-colors">
               {l.label}
             </a>
           ))}

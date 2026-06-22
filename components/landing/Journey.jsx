@@ -11,13 +11,13 @@ export default function Journey() {
       {/* preview card */}
       <div className="panel p-6 order-2 lg:order-1">
         <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-2xl bg-accent/10 p-4">
+          <div className="rounded-2xl border border-line bg-accent/10 p-4">
             <div className="flex items-center gap-2 text-accent text-xs font-semibold"><Flame className="h-4 w-4" /> Daily streak</div>
-            <p className="mt-1 text-2xl font-extrabold text-ink">42 days</p>
+            <p className="mt-1 font-display text-2xl font-extrabold text-ink">42 days</p>
           </div>
           <div className="rounded-2xl border border-line p-4">
             <p className="text-xs font-semibold text-muted">Mastery</p>
-            <p className="mt-1 text-2xl font-extrabold text-ink">B2 <span className="text-sm font-medium text-muted">Upper-Int.</span></p>
+            <p className="mt-1 font-display text-2xl font-extrabold text-ink">B2 <span className="text-sm font-medium text-muted">Upper-Int.</span></p>
           </div>
         </div>
         <div className="mt-4 rounded-2xl border border-line p-5">

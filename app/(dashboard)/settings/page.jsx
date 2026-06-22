@@ -135,7 +135,7 @@ export default function SettingsPage() {
       <form onSubmit={saveName} className="py-10 border-b border-line">
         <p className="section-label mb-6">Profile</p>
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-ink flex items-center justify-center text-white text-xl font-bold">
+          <div className="w-14 h-14 rounded-full bg-ink flex items-center justify-center text-[rgb(var(--on-primary))] text-xl font-bold">
             {session?.user?.name?.[0]?.toUpperCase() || "U"}
           </div>
           <div>
@@ -166,7 +166,7 @@ export default function SettingsPage() {
               <button
                 key={t}
                 onClick={() => setTheme(t)}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold capitalize transition-all ${mounted && theme === t ? "bg-accent text-white" : "text-muted hover:text-ink"}`}
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold capitalize transition-all ${mounted && theme === t ? "bg-accent text-[rgb(var(--on-primary))]" : "text-muted hover:text-ink"}`}
               >
                 {t}
               </button>
@@ -184,9 +184,9 @@ export default function SettingsPage() {
             <p className="text-xs text-faint mt-0.5">Words to add or practise each day</p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => saveGoal(Math.max(1, goal - 5))} disabled={savingGoal} className="w-8 h-8 rounded-full bg-surface-2 border border-line text-ink hover:border-accent transition-colors disabled:opacity-50">–</button>
+            <button onClick={() => saveGoal(Math.max(1, goal - 1))} disabled={savingGoal} className="w-8 h-8 rounded-full bg-surface-2 border border-line text-ink hover:border-accent transition-colors disabled:opacity-50">–</button>
             <span className="w-12 text-center text-lg font-bold text-ink">{goal}</span>
-            <button onClick={() => saveGoal(Math.min(200, goal + 5))} disabled={savingGoal} className="w-8 h-8 rounded-full bg-surface-2 border border-line text-ink hover:border-accent transition-colors disabled:opacity-50">+</button>
+            <button onClick={() => saveGoal(Math.min(200, goal + 1))} disabled={savingGoal} className="w-8 h-8 rounded-full bg-surface-2 border border-line text-ink hover:border-accent transition-colors disabled:opacity-50">+</button>
           </div>
         </div>
       </div>

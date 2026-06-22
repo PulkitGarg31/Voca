@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { SkyBackdrop } from "@/components/landing/Sky";
 import { LogoTile } from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Chat, Repeat, Chart } from "@/components/landing/Icons";
@@ -16,24 +15,39 @@ const POINTS = [
 export default function AuthShell({ title, subtitle, children, footer }) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-2">
-      {/* Brand panel */}
-      <div className="relative hidden flex-col justify-between overflow-hidden p-12 lg:flex">
-        <SkyBackdrop />
-        <Link href="/" className="relative z-10 flex items-center gap-2.5">
+      {/* Brand panel — the Noir hero: layered ink/charcoal atmosphere, a soft
+          gold accent glow, a hairline warm border, and an oversized serif
+          flourish. Built from semantic tokens so it reads as warm ivory + bronze
+          in the Editorial (light) theme and charcoal + gold in Noir (dark). */}
+      <div className="relative hidden flex-col justify-between overflow-hidden border-r border-line bg-bg p-12 lg:flex">
+        {/* atmosphere */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-b from-surface-2 via-bg to-bg" />
+        <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-accent/15 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
+        {/* oversized typographic flourish */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-16 -right-6 select-none font-display text-[20rem] font-extrabold italic leading-none text-accent/10"
+        >
+          Aa
+        </span>
+
+        <Link href="/" className="relative z-10 inline-flex items-center gap-2.5">
           <LogoTile />
           <span className="font-display text-lg font-extrabold tracking-tight text-ink">VOCA</span>
         </Link>
         <div className="relative z-10 max-w-md">
-          <h2 className="font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-ink">
-            Build a vocabulary <br /> that <span className="text-accent">finally sticks</span>
+          <span className="section-label">Editorial Noir</span>
+          <h2 className="mt-4 font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-ink">
+            Build a vocabulary <br /> that <span className="italic text-accent">finally sticks</span>
           </h2>
-          <p className="mt-4 text-ink/70">
+          <p className="mt-4 text-muted">
             Learn words 10× faster with AI chat, spaced repetition, and smart practice.
           </p>
           <ul className="mt-8 space-y-4">
             {POINTS.map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-center gap-3 text-sm text-ink/80">
-                <span className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-white/70 text-accent shadow-sm dark:bg-white/10">
+              <li key={text} className="flex items-center gap-3 text-sm text-muted">
+                <span className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-accent shadow-sm">
                   <Icon className="h-4 w-4" />
                 </span>
                 {text}
@@ -41,7 +55,7 @@ export default function AuthShell({ title, subtitle, children, footer }) {
             ))}
           </ul>
         </div>
-        <p className="relative z-10 text-xs text-ink/50">© 2026 VOCA — learn words that stick.</p>
+        <p className="relative z-10 text-xs text-faint">© 2026 VOCA — learn words that stick.</p>
       </div>
 
       {/* Form column */}
