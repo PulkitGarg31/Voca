@@ -19,15 +19,55 @@ function renderFormatted(text) {
   return nodes;
 }
 
-function extractBoldWords(text) {
-  const matches = [];
-  const regex = /\*\*([A-Za-z][a-zA-Z\s\-]{1,30}?)\*\*/g;
+// Words AND phrases the AI is teaching, offered as add-to-collection chips.
+// Primary signal: **bold** spans, tolerating numbering/punctuation inside
+// ("**1. Ennui:**", "**a blessing in disguise**"); up to 5 words. Fallback:
+// the prompt's "Word /pruh-nun-see-AY-shun/" template at the start of a line,
+// which the model often emits without bold. Formatting labels the model also
+// tends to bold (Definition, Tip, ...) are filtered out.
+const CHIP_STOPLIST = new Set([
+  "definition", "example", "examples", "tip", "meaning", "usage", "note",
+  "synonyms", "antonyms", "pronunciation", "word", "phrase", "idiom",
+  "memory trick", "part of speech",
+]);
+
+// Bold EMPHASIS ("**very important**") and section HEADERS ("**To greet the
+// interviewer:**", "**How to use it:**") are not phrases worth saving. Real
+// idioms virtually never start with these words ("when" stays allowed for
+// idioms like "when pigs fly").
+const EMPHASIS_STARTERS = new Set([
+  "you", "your", "i", "my", "we", "our", "they", "their", "he", "his", "she",
+  "her", "this", "that", "these", "those", "very", "really", "quite",
+  "extremely", "please", "always", "never", "also", "however", "remember",
+  "to", "how", "what", "why", "for",
+]);
+
+function extractSuggestedWords(text) {
+  const found = [];
   let m;
-  while ((m = regex.exec(text)) !== null) {
-    const w = m[1].trim();
-    if (/^[A-Za-z\-]+$/.test(w)) matches.push(w.toLowerCase());
+  const bold = /\*\*([^*]{1,60})\*\*/g;
+  while ((m = bold.exec(text)) !== null) {
+    const w = m[1]
+      .replace(/’/g, "'")
+      .replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, "")
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+    const firstWord = w.split(" ")[0];
+    if (
+      w.length <= 40 &&
+      /^[a-z][a-z'\-]*(?: [a-z][a-z'\-]*){0,5}$/.test(w) &&
+      !CHIP_STOPLIST.has(w) &&
+      (!w.includes(" ") || !EMPHASIS_STARTERS.has(firstWord))
+    ) {
+      found.push(w);
+    }
   }
-  return [...new Set(matches)];
+  const pron = /(?:^|\n)\s*(?:\d+\.\s*)?([A-Za-z][A-Za-z\-]{1,29})\s*\/[^/\n]+\//g;
+  while ((m = pron.exec(text)) !== null) {
+    const w = m[1].toLowerCase();
+    if (!CHIP_STOPLIST.has(w)) found.push(w);
+  }
+  return [...new Set(found)];
 }
 
 function WordChip({ word, onAddWord }) {
@@ -90,7 +130,7 @@ function WordChip({ word, onAddWord }) {
 
 function Bubble({ msg, onAddWord }) {
   const isUser = msg.role === "user";
-  const words = !isUser ? extractBoldWords(msg.content) : [];
+  const words = !isUser ? extractSuggestedWords(msg.content) : [];
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-5`}>
       {!isUser && (
@@ -121,7 +161,8 @@ const STARTERS = [
 export default function ChatPage() {
   const [messages, setMessages] = useState([GREETING]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);      // waiting for the first token (typing dots)
+  const [streaming, setStreaming] = useState(false);  // reply is arriving token by token
   const [historyLoading, setHistoryLoading] = useState(true);
   const [addedCount, setAddedCount] = useState(0);
   const [conversations, setConversations] = useState([]);
@@ -142,6 +183,7 @@ export default function ChatPage() {
   }
 
   async function openConversation(id) {
+    if (sendingRef.current) return; // don't switch threads while a reply is streaming in
     const seq = ++loadSeqRef.current; // newest open wins; older responses are ignored
     setHistoryLoading(true);
     setConversationId(id);
@@ -159,6 +201,7 @@ export default function ChatPage() {
   }
 
   function newChat() {
+    if (sendingRef.current) return; // don't reset while a reply is streaming in
     setConversationId(null);
     setMessages([GREETING]);
     setInput("");
@@ -184,7 +227,7 @@ export default function ChatPage() {
 
   async function send(text) {
     const msg = text || input.trim();
-    if (!msg || loading || historyLoading || sendingRef.current) return;
+    if (!msg || loading || streaming || historyLoading || sendingRef.current) return;
     // Serialize sends: a second message before the first response sets the new
     // conversationId would otherwise spawn a duplicate conversation.
     sendingRef.current = true;
@@ -197,18 +240,70 @@ export default function ChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: msg, conversationId }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        setMessages((prev) => [...prev, { role: "assistant", content: data.response }]);
-        if (data.conversationId) setConversationId(data.conversationId);
-        refreshConversations(); // surface the new/bumped chat in the sidebar
-      } else {
+
+      // Errors (rate limit, auth, model down) still arrive as JSON.
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
         setMessages((prev) => [...prev, { role: "assistant", content: data.error || "Something went wrong. Please try again." }]);
+        return;
       }
+
+      const newId = res.headers.get("X-Conversation-Id");
+      if (newId) setConversationId(newId);
+
+      // Stream the reply: keep the typing dots until the first chunk arrives,
+      // then grow the assistant bubble token by token.
+      const decoder = new TextDecoder();
+      let acc = "";
+      let started = false;
+      const appendChunk = (chunkText) => {
+        acc += chunkText;
+        const content = acc;
+        if (!started) {
+          started = true;
+          setLoading(false);
+          setStreaming(true);
+          setMessages((prev) => [...prev, { role: "assistant", content }]);
+        } else {
+          setMessages((prev) => {
+            const next = prev.slice();
+            next[next.length - 1] = { role: "assistant", content };
+            return next;
+          });
+        }
+      };
+
+      if (res.body) {
+        const reader = res.body.getReader();
+        try {
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const t = decoder.decode(value, { stream: true });
+            if (t) appendChunk(t);
+          }
+          const tail = decoder.decode();
+          if (tail) appendChunk(tail);
+        } catch (err) {
+          // Dropped mid-stream: keep the partial reply if one started,
+          // otherwise fall through to the network-error bubble.
+          if (!started) throw err;
+        }
+      } else {
+        // Fallback for browsers without streaming fetch bodies.
+        const t = await res.text();
+        if (t) appendChunk(t);
+      }
+
+      if (!acc) {
+        setMessages((prev) => [...prev, { role: "assistant", content: "Something went wrong. Please try again." }]);
+      }
+      refreshConversations(); // surface the new/bumped chat in the sidebar
     } catch {
       setMessages((prev) => [...prev, { role: "assistant", content: "Network error. Please check your connection and try again." }]);
     } finally {
       setLoading(false);
+      setStreaming(false);
       sendingRef.current = false;
     }
   }
@@ -340,7 +435,7 @@ export default function ChatPage() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
             />
-            <button onClick={() => send()} disabled={loading || historyLoading || !input.trim()} className="btn-primary px-4 py-3 flex-shrink-0">
+            <button onClick={() => send()} disabled={loading || streaming || historyLoading || !input.trim()} className="btn-primary px-4 py-3 flex-shrink-0">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
             </button>
           </div>

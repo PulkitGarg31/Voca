@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import ChatConversation from "@/models/ChatConversation";
-import { runVocaChat, clearChatHistory, loadChatHistory } from "@/lib/langchain";
+import { streamVocaChat, clearChatHistory, loadChatHistory } from "@/lib/langchain";
 import { rateLimited } from "@/lib/rateLimit";
 
 // A short title derived from the first user message.
@@ -35,7 +35,10 @@ export async function GET(req) {
 }
 
 // POST /api/chat — send a message. Creates a new conversation when no
-// conversationId is supplied; otherwise continues an owned one.
+// conversationId is supplied; otherwise continues an owned one. The reply is
+// STREAMED as plain-text chunks (not JSON); the conversation id travels in the
+// `X-Conversation-Id` response header. Errors before the first token still
+// return JSON with a proper status code.
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -65,16 +68,45 @@ export async function POST(req) {
       });
     }
 
-    const response = await runVocaChat(message, convo.conversationId);
+    // Await the first chunk before sending headers: config/connection errors
+    // (bad API key, model down) still surface as a clean JSON 500.
+    const gen = streamVocaChat(message, convo.conversationId);
+    const first = await gen.next();
 
     // Bump recency so it sorts to the top of the recent list.
     convo.lastMessageAt = new Date();
     await convo.save();
 
-    return NextResponse.json({
-      response,
-      conversationId: convo.conversationId,
-      title: convo.title,
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          if (!first.done) controller.enqueue(encoder.encode(first.value));
+          for await (const chunk of gen) {
+            controller.enqueue(encoder.encode(chunk));
+          }
+        } catch (err) {
+          console.error("Chat stream error:", err);
+          try {
+            controller.enqueue(encoder.encode("\n\n[Response interrupted. Please try again.]"));
+          } catch {}
+        } finally {
+          try { controller.close(); } catch {}
+        }
+      },
+      cancel() {
+        // Client disconnected: stop the model stream; the generator's finally
+        // block persists the partial reply.
+        gen.return?.();
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        "X-Conversation-Id": convo.conversationId,
+      },
     });
   } catch (err) {
     console.error("Chat error:", err);
