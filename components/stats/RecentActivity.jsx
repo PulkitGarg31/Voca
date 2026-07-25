@@ -19,7 +19,7 @@ export default function RecentActivity({ words = [] }) {
     <div className="panel divide-y divide-line">
       {words.map((w) => {
         const c = catStyle(w.category);
-        const def = w.meanings?.[0]?.definitions?.[0]?.definition || "—";
+        const def = w.meanings?.[0]?.definitions?.[0]?.definition || "No definition yet";
         return (
           <div key={w._id} className="flex items-start gap-3 p-3.5">
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${c.badge}`}>

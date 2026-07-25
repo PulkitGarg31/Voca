@@ -54,7 +54,7 @@ export default function WordCard({ word, onDelete, onToggleFav, onEdit }) {
                 ? "Listening… say the word"
                 : pron.result.correct
                   ? "✓ Correct!"
-                  : <>✗ heard: &ldquo;{pron.result.heard || "—"}&rdquo;</>}
+                  : <>✗ heard: &ldquo;{pron.result.heard || "nothing"}&rdquo;</>}
             </p>
           )}
 

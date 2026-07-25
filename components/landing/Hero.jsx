@@ -19,7 +19,7 @@ export default function Hero({ loggedIn }) {
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-base text-muted md:mx-0 md:text-lg">
             VOCA blends AI conversations, spaced repetition, and smart practice so you
-            learn new words 10× faster — and actually remember them.
+            learn new words 10× faster and actually remember them.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3 md:justify-start">
             {loggedIn ? (

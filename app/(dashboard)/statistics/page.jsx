@@ -91,7 +91,7 @@ export default function StatisticsPage() {
                 </p>
                 <p className="section-label mt-0.5">Daily goal</p>
                 <p className="text-xs text-faint mt-1">
-                  {today.met ? "🎉 Goal reached — nice work!" : `${today.added} added · ${today.practiced} practised`}
+                  {today.met ? "🎉 Goal reached! Nice work." : `${today.added} added · ${today.practiced} practised`}
                 </p>
               </div>
             </div>

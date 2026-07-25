@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, ArrowRight, X } from "@/components/landing/Icons";
+import { Check, X } from "@/components/landing/Icons";
 
 // Eyebrow label: blue uppercase text with an optional leading icon.
 export function SectionLabel({ icon: Icon, children }) {
@@ -23,15 +23,12 @@ export function TwoToneHeading({ top, accent, className = "" }) {
 
 export function FeatureCard({ icon: Icon, title, children }) {
   return (
-    <div className="group panel p-6 flex flex-col gap-4 hover:shadow-md hover:border-line-strong transition-all">
+    <div className="panel p-6 flex flex-col gap-4 hover:shadow-md hover:border-line-strong transition-all">
       <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-accent/10 text-accent">
         <Icon className="h-5 w-5" />
       </span>
       <h3 className="font-display text-lg font-bold text-ink">{title}</h3>
       <p className="text-sm text-muted leading-relaxed flex-1">{children}</p>
-      <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent group-hover:text-accent-hover transition-colors">
-        Learn more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-      </span>
     </div>
   );
 }

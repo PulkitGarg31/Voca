@@ -64,7 +64,7 @@ export default function IdiomOfDay({ onAdded }) {
     loading: { label: "Adding…", cls: "btn-primary", disabled: true },
     added: { label: "Added ✓", cls: "btn-ghost", disabled: true },
     exists: { label: "In your library ✓", cls: "btn-ghost", disabled: true },
-    error: { label: "Failed — retry", cls: "btn-primary", disabled: false },
+    error: { label: "Failed. Retry", cls: "btn-primary", disabled: false },
   }[status];
 
   return (

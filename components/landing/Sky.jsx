@@ -28,8 +28,12 @@ export function SkyBackdrop({ className = "" }) {
       {/* sky gradient + glow + stars */}
       <div className="absolute inset-0 dark:hidden" style={{ backgroundImage: LIGHT }} />
       <div className="absolute inset-0 hidden dark:block" style={{ backgroundImage: DARK }} />
-      {/* pre-rendered fluffy clouds as a soft atmospheric texture, anchored to the bottom */}
-      <div className="absolute inset-0 bg-[url('/sky-clouds.png')] bg-cover bg-bottom bg-no-repeat opacity-[0.22] dark:opacity-[0.10]" />
+      {/* pre-rendered fluffy clouds as a soft atmospheric texture, anchored to the
+          bottom. The PNG is white-on-transparent: on the warm ivory Editorial sky
+          the clouds stay pure white at near-full opacity so they pop as bright
+          puffs against the paper tone; the Noir night sky only needs a whisper. */}
+      <div className="absolute inset-0 bg-[url('/sky-clouds.png')] bg-cover bg-bottom bg-no-repeat opacity-95 dark:hidden" />
+      <div className="absolute inset-0 hidden bg-[url('/sky-clouds.png')] bg-cover bg-bottom bg-no-repeat opacity-[0.10] dark:block" />
     </div>
   );
 }

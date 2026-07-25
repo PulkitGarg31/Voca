@@ -159,7 +159,7 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-ink">Theme</p>
-            <p className="text-xs text-faint mt-0.5">Choose how Voca looks</p>
+            <p className="text-xs text-faint mt-0.5">Choose how VOCA looks</p>
           </div>
           <div className="flex gap-1 bg-surface-2 border border-line rounded-full p-1">
             {["light", "dark"].map((t) => (

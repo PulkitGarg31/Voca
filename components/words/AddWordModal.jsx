@@ -73,7 +73,7 @@ export default function AddWordModal({ onClose, onSaved, editWord = null }) {
       }
       onSaved?.(data);
     } catch {
-      setError("Network error — please try again");
+      setError("Network error. Please try again");
     } finally {
       setSaving(false);
     }

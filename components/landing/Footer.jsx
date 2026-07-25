@@ -8,6 +8,11 @@ const PRODUCT = [
   { label: "Practice", href: "/practice" },
 ];
 const COMPANY = [
+  { label: "About us", href: "/about" },
+  { label: "Terms & Conditions", href: "/terms" },
+  { label: "Privacy Policy", href: "/privacy" },
+];
+const ACCOUNT = [
   { label: "Sign in", href: "/login" },
   { label: "Create account", href: "/register" },
 ];
@@ -22,7 +27,7 @@ export default function Footer() {
             <span className="font-display text-lg font-extrabold tracking-tight text-ink">VOCA</span>
           </div>
           <p className="mt-4 text-sm text-muted max-w-xs">
-            Learn and remember words that actually stick — powered by AI and spaced repetition.
+            Learn and remember words that actually stick, powered by AI and spaced repetition.
           </p>
         </div>
         <div>
@@ -34,7 +39,7 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-faint">Account</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-faint">Company</p>
           <ul className="mt-4 space-y-2.5">
             {COMPANY.map((l) => (
               <li key={l.label}><Link href={l.href} className="text-sm text-muted hover:text-ink transition-colors">{l.label}</Link></li>
@@ -42,8 +47,12 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-faint">Stay in touch</p>
-          <p className="mt-4 text-sm text-muted">hello@voca.app</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-faint">Account</p>
+          <ul className="mt-4 space-y-2.5">
+            {ACCOUNT.map((l) => (
+              <li key={l.label}><Link href={l.href} className="text-sm text-muted hover:text-ink transition-colors">{l.label}</Link></li>
+            ))}
+          </ul>
         </div>
       </div>
       <div className="border-t border-line">

@@ -62,7 +62,7 @@ export default function WordOfDay({ onAdded }) {
     loading: { label: "Adding…", cls: "btn-primary", disabled: true },
     added: { label: "Added ✓", cls: "btn-ghost", disabled: true },
     exists: { label: "In your library ✓", cls: "btn-ghost", disabled: true },
-    error: { label: "Failed — retry", cls: "btn-primary", disabled: false },
+    error: { label: "Failed. Retry", cls: "btn-primary", disabled: false },
   }[status];
 
   return (
@@ -100,7 +100,7 @@ export default function WordOfDay({ onAdded }) {
               {def.example && <p className="font-display text-sm text-faint italic mt-1.5">&ldquo;{def.example}&rdquo;</p>}
             </>
           ) : (
-            <p className="text-sm text-faint mt-2">Definition unavailable right now — add it and look it up later.</p>
+            <p className="text-sm text-faint mt-2">Definition unavailable right now. Add it and look it up later.</p>
           )}
 
           <div className="mt-4">

@@ -7,7 +7,8 @@ export const STORAGE_KEY = "voca-theme";
 
 // Inline script (stringified) run before paint to set the `dark` class and
 // avoid a flash of the wrong theme. Injected in app/layout.jsx <head>.
-export const themeInitScript = `(function(){try{var t=localStorage.getItem('${STORAGE_KEY}');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}if(t==='dark'){document.documentElement.classList.add('dark');}}catch(e){}})();`;
+// Dark (Noir) is the default: everyone gets it unless they explicitly chose light.
+export const themeInitScript = `(function(){var d=true;try{d=localStorage.getItem('${STORAGE_KEY}')!=='light';}catch(e){}if(d){document.documentElement.classList.add('dark');}})();`;
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState("light");

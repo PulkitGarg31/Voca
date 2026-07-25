@@ -17,7 +17,7 @@ const display = Fraunces({
 });
 
 export const metadata = {
-  title: "Voca – Vocabulary Learning Platform",
+  title: "VOCA | Vocabulary Learning Platform",
   description:
     "Store, organize, and practice English words with AI-powered insights",
 };

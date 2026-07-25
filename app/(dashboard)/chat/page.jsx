@@ -78,7 +78,7 @@ function WordChip({ word, onAddWord }) {
     loading: "Adding…",
     added: `Added "${word}"`,
     exists: "Already in list",
-    error: "Failed — retry",
+    error: "Failed. Retry",
   };
 
   return (
@@ -110,7 +110,7 @@ function Bubble({ msg, onAddWord }) {
   );
 }
 
-const GREETING = { role: "assistant", content: "Hi! I'm Voca — ask me about any word. Words I mention will appear as chips you can **add directly to your list**." };
+const GREETING = { role: "assistant", content: "Hi! I'm VOCA. Ask me about any word. Words I mention will appear as chips you can **add directly to your list**." };
 const STARTERS = [
   "Explain the word 'ephemeral' with examples",
   "Give me 5 advanced academic words",
@@ -206,7 +206,7 @@ export default function ChatPage() {
         setMessages((prev) => [...prev, { role: "assistant", content: data.error || "Something went wrong. Please try again." }]);
       }
     } catch {
-      setMessages((prev) => [...prev, { role: "assistant", content: "Network error — please check your connection and try again." }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Network error. Please check your connection and try again." }]);
     } finally {
       setLoading(false);
       sendingRef.current = false;
