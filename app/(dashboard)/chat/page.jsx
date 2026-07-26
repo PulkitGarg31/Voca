@@ -258,8 +258,11 @@ export default function ChatPage() {
       const newId = res.headers.get("X-Conversation-Id");
       if (newId) setConversationId(newId);
 
+      // Header present ⇔ request ran on the owner's key; absence on a success
+      // means BYOK, so clear any stale counter/trial notice.
       const rem = res.headers.get("X-Free-Chats-Remaining");
-      if (rem !== null) setFreeLeft(Number(rem));
+      setFreeLeft(rem !== null ? Number(rem) : null);
+      setTrialOver(false);
 
       // Stream the reply: keep the typing dots until the first chunk arrives,
       // then grow the assistant bubble token by token.
@@ -457,7 +460,7 @@ export default function ChatPage() {
           ) : (
             <p className="text-[10px] text-faint mt-2 text-center">
               History saved automatically · Shift+Enter for new line
-              {freeLeft !== null && <> · {freeLeft} free chats left</>}
+              {freeLeft !== null && <> · {freeLeft === 1 ? "1 free chat left" : `${freeLeft} free chats left`}</>}
             </p>
           )}
         </div>
