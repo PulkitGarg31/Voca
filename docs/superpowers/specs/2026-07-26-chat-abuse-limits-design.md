@@ -57,7 +57,7 @@ All four supported providers speak the OpenAI-compatible protocol the app alread
 |---|---|---|---|
 | `nvidia` | `https://integrate.api.nvidia.com/v1` | `NVIDIA_MODEL` env or `meta/llama-3.3-70b-instruct` | `nvapi-` |
 | `openai` | `https://api.openai.com/v1` | `gpt-4o-mini` | `sk-` |
-| `gemini` | `https://generativelanguage.googleapis.com/v1beta/openai/` | `gemini-2.5-flash` | `AIza` |
+| `gemini` | `https://generativelanguage.googleapis.com/v1beta/openai/` | `gemini-flash-latest` (alias — pinned models rot: `gemini-2.5-flash` was retired for new users while still listed) | `AQ.` or `AIza` (Google's 2026 key-format transition) |
 | `anthropic` | `https://api.anthropic.com/v1/` (official OpenAI SDK compatibility layer) | `claude-haiku-4-5-20251001` | `sk-ant-` |
 
 - New fields on `User`:

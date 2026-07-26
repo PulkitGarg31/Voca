@@ -120,12 +120,11 @@ MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/voca
 NEXTAUTH_SECRET=your_secret_here
 NEXTAUTH_URL=http://localhost:3000
 
-# Gemini — https://aistudio.google.com/app/apikey
-GEMINI_API_KEY=your_gemini_key_here
+# NVIDIA NIM — get a key (starts with nvapi-) at https://build.nvidia.com
+NVIDIA_API_KEY=your_nvidia_key_here
 
-# Optional: override the Gemini model (defaults to gemini-2.5-flash-lite).
-# Set this if the default model name isn't available for your API key/region.
-# GEMINI_MODEL=gemini-1.5-flash
+# Optional: override the model (defaults to meta/llama-3.3-70b-instruct).
+# NVIDIA_MODEL=meta/llama-3.3-70b-instruct
 
 # Optional: enable "Continue with Google". Redirect URI: <NEXTAUTH_URL>/api/auth/callback/google
 # GOOGLE_CLIENT_ID=
