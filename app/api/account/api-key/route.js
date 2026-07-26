@@ -61,9 +61,9 @@ export async function PUT(req) {
     if (apiKey.length < 10 || apiKey.length > 512) {
       return NextResponse.json({ error: "That key doesn't look valid" }, { status: 400 });
     }
-    if (!apiKey.startsWith(p.keyPrefix)) {
+    if (!p.keyPrefixes.some((pre) => apiKey.startsWith(pre))) {
       return NextResponse.json(
-        { error: `${p.label} keys start with "${p.keyPrefix}" — check you picked the right provider` },
+        { error: `${p.label} keys start with ${p.keyPrefixes.map((x) => `"${x}"`).join(" or ")} — check you picked the right provider` },
         { status: 400 }
       );
     }

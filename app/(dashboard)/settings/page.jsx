@@ -8,7 +8,7 @@ import { useToast, useConfirm } from "@/components/Feedback";
 const AI_PROVIDERS = [
   { id: "nvidia", label: "NVIDIA NIM", hint: "nvapi-…", defaultModel: "meta/llama-3.3-70b-instruct" },
   { id: "openai", label: "OpenAI", hint: "sk-…", defaultModel: "gpt-4o-mini" },
-  { id: "gemini", label: "Google Gemini", hint: "AIza…", defaultModel: "gemini-2.5-flash" },
+  { id: "gemini", label: "Google Gemini", hint: "AQ.… or AIza…", defaultModel: "gemini-2.5-flash" },
   { id: "anthropic", label: "Anthropic Claude", hint: "sk-ant-…", defaultModel: "claude-haiku-4-5-20251001" },
 ];
 
