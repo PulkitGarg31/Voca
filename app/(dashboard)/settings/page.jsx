@@ -161,6 +161,13 @@ export default function SettingsPage() {
   }
 
   async function removeAiKey() {
+    const ok = await confirm({
+      title: "Remove your API key?",
+      message: "The key can't be shown again after removal, and the free AI limits will apply to your account.",
+      confirmLabel: "Remove key",
+      danger: true,
+    });
+    if (!ok) return;
     setSavingAi(true);
     try {
       const res = await fetch("/api/account/api-key", { method: "DELETE" });
@@ -273,8 +280,9 @@ export default function SettingsPage() {
             </p>
             <select
               className="input"
+              aria-label="AI provider"
               value={ai.provider}
-              onChange={(e) => setAi({ ...ai, provider: e.target.value })}
+              onChange={(e) => { setAiMsg(null); setAi({ ...ai, provider: e.target.value }); }}
             >
               {AI_PROVIDERS.map((p) => (
                 <option key={p.id} value={p.id}>{p.label}</option>
@@ -282,6 +290,8 @@ export default function SettingsPage() {
             </select>
             <input
               type="password"
+              name="ai-api-key"
+              autoComplete="new-password"
               className="input"
               placeholder={`API key (${AI_PROVIDERS.find((p) => p.id === ai.provider)?.hint})`}
               value={ai.key}
@@ -289,6 +299,7 @@ export default function SettingsPage() {
             />
             <input
               className="input"
+              spellCheck={false}
               placeholder={`Model (optional, default: ${AI_PROVIDERS.find((p) => p.id === ai.provider)?.defaultModel})`}
               value={ai.model}
               onChange={(e) => setAi({ ...ai, model: e.target.value })}
