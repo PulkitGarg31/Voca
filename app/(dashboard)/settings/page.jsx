@@ -4,6 +4,14 @@ import { useSession, signOut } from "next-auth/react";
 import { useTheme } from "@/components/ThemeProvider";
 import { useToast, useConfirm } from "@/components/Feedback";
 
+// Client-side mirror of lib/providers.js (labels + input hints only).
+const AI_PROVIDERS = [
+  { id: "nvidia", label: "NVIDIA NIM", hint: "nvapi-…", defaultModel: "meta/llama-3.3-70b-instruct" },
+  { id: "openai", label: "OpenAI", hint: "sk-…", defaultModel: "gpt-4o-mini" },
+  { id: "gemini", label: "Google Gemini", hint: "AIza…", defaultModel: "gemini-2.5-flash" },
+  { id: "anthropic", label: "Anthropic Claude", hint: "sk-ant-…", defaultModel: "claude-haiku-4-5-20251001" },
+];
+
 export default function SettingsPage() {
   const { data: session, update } = useSession();
   const { theme, mounted, setTheme } = useTheme();
@@ -23,6 +31,11 @@ export default function SettingsPage() {
 
   const [deleting, setDeleting] = useState(false);
 
+  const [ai, setAi] = useState({ provider: "nvidia", key: "", model: "" });
+  const [aiSaved, setAiSaved] = useState(null); // { provider, masked, model } | null
+  const [aiMsg, setAiMsg] = useState(null);
+  const [savingAi, setSavingAi] = useState(false);
+
   useEffect(() => {
     if (session?.user?.name) setName(session.user.name);
   }, [session?.user?.name]);
@@ -32,6 +45,14 @@ export default function SettingsPage() {
     fetch("/api/account")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => d?.dailyGoal && setGoal(d.dailyGoal))
+      .catch(() => {});
+  }, []);
+
+  // Load BYOK status (masked — the full key never reaches the client).
+  useEffect(() => {
+    fetch("/api/account/api-key")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.provider && setAiSaved(d))
       .catch(() => {});
   }, []);
 
@@ -117,6 +138,42 @@ export default function SettingsPage() {
     }
   }
 
+  async function saveAiKey(e) {
+    e.preventDefault();
+    setAiMsg(null);
+    setSavingAi(true);
+    try {
+      const res = await fetch("/api/account/api-key", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: ai.provider, apiKey: ai.key.trim(), model: ai.model.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save key");
+      setAiSaved(data);
+      setAi({ provider: ai.provider, key: "", model: "" });
+      toast.success("API key saved — free AI limits no longer apply");
+    } catch (err) {
+      setAiMsg({ type: "err", text: err.message });
+    } finally {
+      setSavingAi(false);
+    }
+  }
+
+  async function removeAiKey() {
+    setSavingAi(true);
+    try {
+      const res = await fetch("/api/account/api-key", { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      setAiSaved(null);
+      toast.success("API key removed");
+    } catch {
+      toast.error("Couldn't remove the key");
+    } finally {
+      setSavingAi(false);
+    }
+  }
+
   const Msg = ({ msg }) =>
     msg ? (
       <p className={`text-xs rounded-lg px-3 py-2 ${msg.type === "ok" ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20" : "text-red-500 bg-red-500/10 border border-red-500/20"}`}>
@@ -189,6 +246,59 @@ export default function SettingsPage() {
             <button onClick={() => saveGoal(Math.min(200, goal + 1))} disabled={savingGoal} className="w-8 h-8 rounded-full bg-surface-2 border border-line text-ink hover:border-accent transition-colors disabled:opacity-50">+</button>
           </div>
         </div>
+      </div>
+
+      {/* AI API key */}
+      <div className="py-10 border-b border-line">
+        <p className="section-label mb-6">AI API key</p>
+        {aiSaved ? (
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <p className="text-sm font-semibold text-ink">
+                {AI_PROVIDERS.find((p) => p.id === aiSaved.provider)?.label || aiSaved.provider}
+              </p>
+              <p className="text-xs text-faint mt-0.5 font-mono">
+                {aiSaved.masked}{aiSaved.model ? ` · ${aiSaved.model}` : ""}
+              </p>
+              <p className="text-xs text-faint mt-1">Your key powers AI chat and word help — free limits no longer apply.</p>
+            </div>
+            <button onClick={removeAiKey} disabled={savingAi} className="btn-ghost text-xs py-2 px-4">
+              {savingAi ? "Removing…" : "Remove key"}
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={saveAiKey} className="space-y-3">
+            <p className="text-xs text-faint">
+              Add your own key to lift the free AI limits. NVIDIA keys are free at build.nvidia.com.
+            </p>
+            <select
+              className="input"
+              value={ai.provider}
+              onChange={(e) => setAi({ ...ai, provider: e.target.value })}
+            >
+              {AI_PROVIDERS.map((p) => (
+                <option key={p.id} value={p.id}>{p.label}</option>
+              ))}
+            </select>
+            <input
+              type="password"
+              className="input"
+              placeholder={`API key (${AI_PROVIDERS.find((p) => p.id === ai.provider)?.hint})`}
+              value={ai.key}
+              onChange={(e) => setAi({ ...ai, key: e.target.value })}
+            />
+            <input
+              className="input"
+              placeholder={`Model (optional, default: ${AI_PROVIDERS.find((p) => p.id === ai.provider)?.defaultModel})`}
+              value={ai.model}
+              onChange={(e) => setAi({ ...ai, model: e.target.value })}
+            />
+            <Msg msg={aiMsg} />
+            <button type="submit" disabled={savingAi || !ai.key.trim()} className="btn-primary">
+              {savingAi ? "Saving…" : "Save key"}
+            </button>
+          </form>
+        )}
       </div>
 
       {/* Security */}
