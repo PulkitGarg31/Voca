@@ -17,33 +17,34 @@ The existing in-memory limiter ([lib/rateLimit.js](../../../lib/rateLimit.js)) i
 | What | Limit | Scope | Storage |
 |---|---|---|---|
 | AI chat messages | **50 lifetime** | per account, only on owner's key | `User.aiChatsUsed` field |
-| Word-helper calls | **30 / day** | per account, only on owner's key | `AiUsage` collection (TTL) |
-| All AI calls (chat + helper) | **150 / day** | per client IP, only on owner's key | `AiUsage` collection (TTL) |
+| Word-helper calls | **50 lifetime** | per account, only on owner's key | `User.aiHelperUsed` field |
+| All AI calls (chat + helper) | **200 lifetime** | per client IP, only on owner's key | `AiUsage` collection (no expiry) |
 | Chat message length | **2,000 chars** | per request | validation only |
 | History sent to model | **last 12 messages** | per request | slice before invoke |
 | Existing per-minute burst limits | 20/min chat, 15/min helper | per account, always (BYOK too) | in-memory (unchanged) |
 
-Requests made with a user's **own** key skip the lifetime cap, the daily cap, and the IP umbrella — but still pass the per-minute burst limits (protects server resources, not credits).
+Nothing resets on a schedule — every quota is a lifetime budget, so the absolute worst-case spend on the owner's key is hard-bounded. Requests made with a user's **own** key skip all lifetime caps and the IP umbrella — but still pass the per-minute burst limits (protects server resources, not credits).
 
 ## Components
 
-### 1. Lifetime chat counter — `User.aiChatsUsed`
+### 1. Lifetime per-account counters — `User.aiChatsUsed` / `User.aiHelperUsed`
 
-- New field on [models/User.js](../../../models/User.js): `aiChatsUsed: { type: Number, default: 0 }`.
-- Consumed in the chat POST route with one race-safe atomic op:
+- Two new fields on [models/User.js](../../../models/User.js): `aiChatsUsed: { type: Number, default: 0 }` and `aiHelperUsed: { type: Number, default: 0 }`.
+- Consumed with one race-safe atomic op per request, e.g. in the chat POST route:
   `User.findOneAndUpdate({ _id: userId, aiChatsUsed: { $lt: 50 } }, { $inc: { aiChatsUsed: 1 } }, { new: true })`.
-  A `null` result means the trial is exhausted → 429 `{ error, code: "TRIAL_EXHAUSTED" }`.
-- Incremented **before** the model call (a request that reaches NVIDIA always counts). Never incremented when the user's own key is used, so removing a BYOK key later restores the untouched trial balance.
-- Deleted automatically with the account (it is part of the User document).
+  A `null` result means the budget is exhausted → 429 `{ error, code: "TRIAL_EXHAUSTED" }` (chat) / `code: "HELPER_LIMIT"` (word-helper, same pattern on `aiHelperUsed`). A shared `lifetimeQuota(userId, field, limit)` helper in a new [lib/quota.js](../../../lib/quota.js) wraps this.
+- Incremented **before** the model call (a request that reaches NVIDIA always counts). Never incremented when the user's own key is used, so removing a BYOK key later restores the untouched remaining balance.
+- Deleted automatically with the account (they are part of the User document). Deliberate consequence: deleting and re-registering an account does reset the per-account budgets — the per-IP umbrella below is what bounds that loop.
 
-### 2. Daily counters — new `AiUsage` model
+### 2. Lifetime per-IP counter — new `AiUsage` model
 
 - New model [models/AiUsage.js](../../../models/AiUsage.js), collection `ai_usages`:
-  `{ key: String (unique), count: Number, expiresAt: Date }` with a TTL index on `expiresAt` (`expireAfterSeconds: 0`).
-- Key formats: `helper:u:<userId>:<YYYY-MM-DD>` and `ai:ip:<ip>:<YYYY-MM-DD>` (UTC dates).
-- New helper `dailyQuota(key, limit)` in a new [lib/quota.js](../../../lib/quota.js) (also home of the lifetime-counter helper): one atomic `findOneAndUpdate` with `$inc: { count: 1 }`, `$setOnInsert: { expiresAt: <next UTC midnight> }`, `upsert: true, new: true`; returns over-limit when `count > limit`. Race-safe across instances because Mongo applies `$inc` atomically.
-- Over limit → 429 with `code: "DAILY_LIMIT"` (helper) or `code: "IP_LIMIT"` (umbrella). IP comes from the existing `clientIp(req)`.
-- `AiUsage` rows are not user-owned data requiring cascade on account deletion; the TTL removes them within 24h.
+  `{ key: String (unique), count: Number }`. No TTL, no expiry — lifetime by design.
+- Key format: `ai:ip:<ip>` (no date component). IP comes from the existing `clientIp(req)`.
+- New helper `ipQuota(ip, limit)` in [lib/quota.js](../../../lib/quota.js): one atomic `findOneAndUpdate` with `$inc: { count: 1 }`, `upsert: true, new: true`; over-limit when `count > limit`. Race-safe across instances because Mongo applies `$inc` atomically.
+- Over limit → 429 with `code: "IP_LIMIT"`.
+- Rows are one tiny document per IP ever seen — unbounded in principle, negligible in practice; no cascade on account deletion needed.
+- **Accepted trade-off:** a lifetime IP cap never resets, so a shared IP (campus/office NAT, carrier CGNAT) permanently exhausts its 200 free calls for everyone behind it. Intended: the goal is a hard ceiling on total owner-key spend, and affected users always have the BYOK path.
 
 ### 3. Bring-your-own-key (BYOK)
 
@@ -67,18 +68,20 @@ Requests made with a user's **own** key skip the lifetime cap, the daily cap, an
 
 - Every successful chat response (on the owner's key) includes `X-Free-Chats-Remaining: <n>`.
 - The chat UI shows a quiet "N free chats left" indicator once the header is seen (hidden for BYOK users; nothing shown until the first response).
-- On 429 `TRIAL_EXHAUSTED`, the composer area shows: *"You've used all 50 free AI chats. Add your own NVIDIA API key in Settings to keep chatting — it's free at build.nvidia.com."* with a link to `/settings`. Other 429 codes reuse the existing "slow down" toast behavior.
+- On 429 `TRIAL_EXHAUSTED`, the composer area shows: *"You've used all 50 free AI chats. Add your own NVIDIA API key in Settings to keep chatting — it's free at build.nvidia.com."* with a link to `/settings`.
+- On 429 `HELPER_LIMIT`, the word card's AI-help area shows the returned message: *"You've used all 50 free AI word helps. Add your own NVIDIA API key in Settings to keep going."*
+- Other 429 codes (burst, `IP_LIMIT`) reuse the existing "slow down" toast behavior.
 
 ## Order of checks in the chat POST
 
-1. Session (401) → 2. body parse + length validation (400) → 3. per-minute burst limit (429) → 4. `connectDB()`, load user incl. key → 5. if BYOK: skip to 7 → 6. IP umbrella, then lifetime counter (429s; IP check first so exhausted-trial users don't dodge the umbrella probe) → 7. conversation resolve → 8. stream.
+1. Session (401) → 2. body parse + length validation (400) → 3. per-minute burst limit (429) → 4. `connectDB()`, load user incl. key → 5. if BYOK: skip to 7 → 6. IP umbrella, then lifetime chat counter (429s; IP check first so exhausted-trial accounts still consume the IP budget) → 7. conversation resolve → 8. stream.
 
-Word-helper: session → burst limit → validation → user/key load → (if owner key) IP umbrella + daily quota → model call.
+Word-helper: session → burst limit → validation → user/key load → (if owner key) IP umbrella, then lifetime helper counter → model call.
 
 ## Error handling
 
 - Quota checks run after `connectDB()`; if Mongo is down the request already fails before any NVIDIA spend (fail-closed by construction).
-- Increment-then-call means a failed NVIDIA call still consumes one trial credit; acceptable at these limits (no refund logic — YAGNI).
+- Increment-then-call means a failed NVIDIA call still consumes one credit of the relevant lifetime budget; acceptable at these limits (no refund logic — YAGNI).
 
 ## Verification (no test framework in this repo)
 
@@ -86,11 +89,13 @@ Word-helper: session → burst limit → validation → user/key load → (if ow
 2. Manual on localhost: temporarily set the lifetime cap to 2 → third chat returns 429 with the Settings prompt; counter UI shows remaining correctly.
 3. Save a real NVIDIA key in Settings → chat works past the cap, `aiChatsUsed` stops incrementing, GET returns only the masked key.
 4. Remove key → capped state returns. Invalid key (`nvapi-junk`) → chat surfaces the "key rejected" message.
-5. 2,001-char message → 400. Word-helper 31st call same UTC day (cap temporarily lowered) → 429.
+5. 2,001-char message → 400. Word-helper past its lifetime cap (temporarily lowered to 2) → 429 with the Settings message.
+6. IP umbrella (temporarily lowered) → 429 `IP_LIMIT` even from a fresh account on the same IP.
 
 ## Out of scope
 
 - Redis/Upstash-backed per-minute limiting (documented follow-up for scale).
 - CAPTCHA / email verification on signup (IP umbrella covers the credible bot vector for now).
 - Refunding trial credits on failed model calls.
+- Any reset mechanism for exhausted budgets (per-account or per-IP) — raising the constants and redeploying is the only lever, by design.
 - Admin UI for adjusting quotas (constants in code).
