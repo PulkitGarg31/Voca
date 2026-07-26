@@ -5,6 +5,7 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { encryptSecret, decryptSecret } from "@/lib/secrets";
 import { PROVIDERS, MODEL_NAME_RE } from "@/lib/providers";
+import { rateLimited } from "@/lib/rateLimit";
 
 // The full key is NEVER returned after save — masked form only.
 function mask(key) {
@@ -22,7 +23,9 @@ export async function GET() {
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const key = user.aiApiKey ? decryptSecret(user.aiApiKey) : null;
-    if (!key) return NextResponse.json({ provider: null, masked: null, model: "" });
+    if (!key || !PROVIDERS[user.aiProvider]) {
+      return NextResponse.json({ provider: null, masked: null, model: "" });
+    }
     return NextResponse.json({ provider: user.aiProvider, masked: mask(key), model: user.aiModel || "" });
   } catch (err) {
     console.error("API key GET error:", err);
@@ -36,8 +39,20 @@ export async function PUT(req) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const body = await req.json();
-    const provider = body.provider;
+    const limited = rateLimited(`api-key:${session.user.id}`, { limit: 10, windowMs: 60_000 });
+    if (limited) return limited;
+
+    // Parse the body in isolation: a JSON SyntaxError message can embed raw
+    // body fragments (i.e. the key) — never let it reach the outer catch's log.
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+    body = body || {};
+
+    const provider = typeof body.provider === "string" ? body.provider : "";
     const apiKey = typeof body.apiKey === "string" ? body.apiKey.trim() : "";
     const model = typeof body.model === "string" ? body.model.trim() : "";
 
@@ -57,11 +72,12 @@ export async function PUT(req) {
     }
 
     await connectDB();
-    await User.findByIdAndUpdate(session.user.id, {
+    const user = await User.findByIdAndUpdate(session.user.id, {
       aiProvider: provider,
       aiApiKey: encryptSecret(apiKey),
       aiModel: model,
     });
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
     return NextResponse.json({ provider, masked: mask(apiKey), model });
   } catch (err) {
     console.error("API key PUT error:", err);
