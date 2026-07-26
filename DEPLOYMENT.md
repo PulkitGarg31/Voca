@@ -79,7 +79,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | Variable | Value | Notes |
 |---|---|---|
 | `NEXTAUTH_URL` | `https://<project>.vercel.app` | Your production URL. If you don't know the final URL yet, set it after the first deploy and redeploy. |
-| `NVIDIA_MODEL` | `` | Optional override; this is the default anyway. |
+| `NVIDIA_MODEL` | `meta/llama-3.1-8b-instruct` | Optional override (default: `meta/llama-3.3-70b-instruct`). **The free-tier 70B queue congests badly at times** (measured 137s to first token while 8B answered in 0.3s) — the 8B model is the reliable choice for production chat; swap back anytime via this var + redeploy. |
 
 ### Optional — Google sign-in
 
@@ -187,5 +187,6 @@ instructions. Afterwards update:
 | One-off 500 on the first request after idle | Serverless cold start + Atlas first connection | Retry; resume the cluster if it was auto-paused |
 | Google login error page | Redirect URI not registered | Add `https://<domain>/api/auth/callback/google` in Google console |
 | Chat replies cut off mid-stream | Function duration cap | `export const maxDuration = 60;` in the chat route |
+| Chat takes 30s+ to answer (or dies ~60s) | NVIDIA free-tier queue for the big model is congested | Set `NVIDIA_MODEL=meta/llama-3.1-8b-instruct` and redeploy |
 | User reports "used all 50 free chats" but is new | They share an exhausted IP, or re-registered after exhausting | Working as designed; they can add their own key |
 | Gemini BYOK "key rejected" | Bad/old key, or retired model override | Re-mint key at aistudio.google.com; clear the model override |
