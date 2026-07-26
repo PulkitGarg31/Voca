@@ -975,6 +975,7 @@ Temporarily edit `lib/quota.js`: `chat: 2, helper: 2, ip: 200`. Run `npm run dev
 3. Chat again → works past the exhausted trial, no counter in the footer, `aiChatsUsed` unchanged in Atlas.
 4. Remove the key → next chat message is blocked again (trial still exhausted).
 5. Save a garbage-but-well-formed key (`nvapi-` + 20 random chars) → chat shows "Your NVIDIA NIM API key was rejected. Check it in Settings."
+6. If a Gemini key is available to test: save a garbage `AIza...` key → check which error surfaces. Google historically returns HTTP **400** (not 401/403) for invalid keys, which would bypass the "key rejected" mapping and show a generic 500; if confirmed, widen the catch branch with `byok.provider === "gemini" && status === 400`.
 
 - [ ] **Step 4: Manual pass — input limits**
 
