@@ -56,6 +56,7 @@ export async function POST(req) {
     if (message.length > 2000) {
       return NextResponse.json({ error: "Message is too long (max 2,000 characters)." }, { status: 400 });
     }
+    if (incomingId && typeof incomingId !== "string") return NextResponse.json({ error: "Invalid conversationId" }, { status: 400 });
 
     const limited = rateLimited(`chat:${userId}`, { limit: 20, windowMs: 60_000 });
     if (limited) return limited;
@@ -65,6 +66,14 @@ export async function POST(req) {
     const user = await User.findById(userId).select("+aiApiKey");
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     byok = resolveByok(user);
+
+    // Continue an owned conversation: validate BEFORE consuming any budget so
+    // a stale id can't burn a lifetime credit.
+    let convo = null;
+    if (incomingId) {
+      convo = await ChatConversation.findOne({ userId, conversationId: incomingId });
+      if (!convo) return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
 
     // Free lifetime budgets bind only when the request runs on the owner's
     // key. IP umbrella first: exhausted-trial accounts still consume it.
@@ -87,12 +96,7 @@ export async function POST(req) {
       freeRemaining = quota.remaining;
     }
 
-    // Resolve the conversation: continue an owned one, or start a new thread.
-    let convo = null;
-    if (incomingId) {
-      convo = await ChatConversation.findOne({ userId, conversationId: incomingId });
-      if (!convo) return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
-    } else {
+    if (!convo) {
       convo = await ChatConversation.create({
         userId,
         conversationId: randomUUID(),
@@ -107,7 +111,12 @@ export async function POST(req) {
 
     // Bump recency so it sorts to the top of the recent list.
     convo.lastMessageAt = new Date();
-    await convo.save();
+    try {
+      await convo.save();
+    } catch (e) {
+      gen.return?.(); // stop the upstream stream; generator's finally persists the partial
+      throw e;
+    }
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
@@ -146,9 +155,12 @@ export async function POST(req) {
     const status = err?.status ?? err?.response?.status;
     if (byok && (status === 401 || status === 403)) {
       return NextResponse.json(
-        { error: `Your ${byok.label} API key was rejected. Check it in Settings.` },
+        { error: `Your ${byok.label} API key was rejected. Check it in Settings.`, code: "BYOK_REJECTED" },
         { status: 401 }
       );
+    }
+    if (!byok && (status === 401 || status === 403)) {
+      return NextResponse.json({ error: "AI is temporarily unavailable. Please try again later." }, { status: 500 });
     }
     return NextResponse.json(
       { error: err.message || "AI response failed" },
