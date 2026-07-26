@@ -41,9 +41,15 @@ codebase as of the AI-limits + bring-your-own-key release (`main @ 70ce75e`).
    **Allow access from anywhere (`0.0.0.0/0`)**. Vercel functions have no
    fixed IPs — without this, every API call times out with
    `ReplicaSetNoPrimary` errors.
-4. **Connection string**: Database → Connect → Drivers → copy the
-   `mongodb+srv://...` URI and make sure the path names the database:
-   `mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/voca`
+4. **Connection string** — two ways to get it:
+   - **Shortcut**: if the app already runs locally against Atlas, the
+     `MONGODB_URI` in your `.env.local` is exactly the string to use — copy
+     it from there.
+   - **From the Atlas UI**: left sidebar → **Clusters** → **Connect** button
+     on your cluster → **Drivers** → copy the `mongodb+srv://...` string
+     (there's a copy button). Replace `<password>` with the database user's
+     password and make sure the path names the database:
+     `mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/voca`
 5. **Auto-pause gotcha**: free clusters pause after inactivity. Symptoms are
    ~30s hangs and Atlas hostnames vanishing from DNS. Resume the cluster in
    the Atlas dashboard; the first request after resume is slow.
