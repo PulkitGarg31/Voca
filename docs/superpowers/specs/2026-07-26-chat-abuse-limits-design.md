@@ -46,18 +46,32 @@ Nothing resets on a schedule — every quota is a lifetime budget, so the absolu
 - Rows are one tiny document per IP ever seen — unbounded in principle, negligible in practice; no cascade on account deletion needed.
 - **Accepted trade-off:** a lifetime IP cap never resets, so a shared IP (campus/office NAT, carrier CGNAT) permanently exhausts its 200 free calls for everyone behind it. Intended: the goal is a hard ceiling on total owner-key spend, and affected users always have the BYOK path.
 
-### 3. Bring-your-own-key (BYOK)
+### 3. Bring-your-own-key (BYOK) — multi-provider
 
-- New field on `User`: `nvidiaApiKey: { type: String, select: false }` storing `iv:tag:ciphertext` (base64), AES-256-GCM, key = SHA-256 of `NEXTAUTH_SECRET`. Crypto helpers (`encryptSecret`/`decryptSecret`, Node `crypto`) live in a new [lib/secrets.js](../../../lib/secrets.js) (quota logic stays in `lib/quota.js`).
+All four supported providers speak the OpenAI-compatible protocol the app already uses, so there is **one code path** (`ChatOpenAI` with a per-provider `baseURL`) and zero new dependencies.
+
+**Provider map** — a fixed table in a new [lib/providers.js](../../../lib/providers.js):
+
+| Provider id | Base URL | Default model | Key prefix |
+|---|---|---|---|
+| `nvidia` | `https://integrate.api.nvidia.com/v1` | `NVIDIA_MODEL` env or `meta/llama-3.3-70b-instruct` | `nvapi-` |
+| `openai` | `https://api.openai.com/v1` | `gpt-4o-mini` | `sk-` |
+| `gemini` | `https://generativelanguage.googleapis.com/v1beta/openai/` | `gemini-2.5-flash` | `AIza` |
+| `anthropic` | `https://api.anthropic.com/v1/` (official OpenAI SDK compatibility layer) | `claude-haiku-4-5-20251001` | `sk-ant-` |
+
+- New fields on `User`:
+  - `aiProvider: { type: String, enum: ["nvidia", "openai", "gemini", "anthropic"] }`
+  - `aiApiKey: { type: String, select: false }` storing `iv:tag:ciphertext` (base64), AES-256-GCM, key = SHA-256 of `NEXTAUTH_SECRET`. Crypto helpers (`encryptSecret`/`decryptSecret`, Node `crypto`) live in a new [lib/secrets.js](../../../lib/secrets.js) (quota logic stays in `lib/quota.js`).
+  - `aiModel: { type: String }` — optional model override; empty = the provider's default. Max 100 chars, charset `[A-Za-z0-9._:/-]`.
   - If `NEXTAUTH_SECRET` rotates, stored keys fail to decrypt → treat as "no key" (fall back to owner key + caps) and let the user re-add. Never crash on decrypt failure.
 - **API:** new route `app/api/account/api-key/route.js`:
-  - `PUT { apiKey }` — must be a string, start with `nvapi-`, length 20–256; encrypt and save. Responds with the masked form only.
-  - `DELETE` — unsets the field.
-  - `GET` — returns `{ masked: "nvapi-••••1234" | null }` (last 4 chars only). The full key is **never** sent to the client after save.
+  - `PUT { provider, apiKey, model? }` — provider must be in the map; key must be a string, length 10–512, and start with the provider's prefix (catches paste-into-wrong-provider mistakes); encrypt and save all three fields. Responds with `{ provider, masked, model }` only.
+  - `DELETE` — unsets all three fields.
+  - `GET` — returns `{ provider, masked: "sk-••••1234" | null, model }` (last 4 chars only). The full key is **never** sent to the client after save.
   - Standard route conventions: session check, `connectDB()`, scoped to `session.user.id`, try/catch → generic 500.
-- **Usage:** chat POST and word-helper POST fetch the user with `.select("+nvidiaApiKey")`, decrypt, and pass the key through: `streamVocaChat(message, sessionId, { apiKey })` / `generateWordHelp(word, { apiKey })`. In [lib/langchain.js](../../../lib/langchain.js), `apiKey` defaults to `process.env.NVIDIA_API_KEY`.
-- A 401/403 from NVIDIA while using a BYOK key → error message telling the user their key was rejected, pointing to Settings (chat route's existing pre-stream error path already returns JSON before headers are sent).
-- **Settings UI:** new "AI API key" card on the settings page: password-type input, Save / Remove buttons, masked display when a key exists, one line explaining that a key from build.nvidia.com removes the free-chat limit. Follows existing semantic-token styling (`bg-surface`, `text-muted`, …).
+- **Usage:** chat POST and word-helper POST fetch the user with `.select("+aiApiKey")`, decrypt, resolve `{ apiKey, baseURL, model }` from the provider map, and pass it through: `streamVocaChat(message, sessionId, { apiKey, baseURL, model })` / `generateWordHelp(word, { ... })`. In [lib/langchain.js](../../../lib/langchain.js) these default to the owner's NVIDIA config.
+- A 401/403 from the provider while using a BYOK key → error message naming the chosen provider and pointing to Settings (chat route's existing pre-stream error path already returns JSON before headers are sent).
+- **Settings UI:** new "AI API key" card: provider dropdown, password-type key input, optional model field (placeholder = the provider default), Save / Remove buttons, masked display + provider name when a key exists, one line explaining that adding a key removes the free limits (and that NVIDIA keys are free at build.nvidia.com). Follows existing semantic-token styling (`bg-surface`, `text-muted`, …).
 
 ### 4. Input/token hardening
 
@@ -68,8 +82,8 @@ Nothing resets on a schedule — every quota is a lifetime budget, so the absolu
 
 - Every successful chat response (on the owner's key) includes `X-Free-Chats-Remaining: <n>`.
 - The chat UI shows a quiet "N free chats left" indicator once the header is seen (hidden for BYOK users; nothing shown until the first response).
-- On 429 `TRIAL_EXHAUSTED`, the composer area shows: *"You've used all 50 free AI chats. Add your own NVIDIA API key in Settings to keep chatting — it's free at build.nvidia.com."* with a link to `/settings`.
-- On 429 `HELPER_LIMIT`, the word card's AI-help area shows the returned message: *"You've used all 50 free AI word helps. Add your own NVIDIA API key in Settings to keep going."*
+- On 429 `TRIAL_EXHAUSTED`, the composer area shows: *"You've used all 50 free AI chats. Add your own API key (NVIDIA, OpenAI, Gemini, or Claude) in Settings to keep chatting — NVIDIA keys are free at build.nvidia.com."* with a link to `/settings`.
+- On 429 `HELPER_LIMIT`, the word card's AI-help area shows the returned message: *"You've used all 50 free AI word helps. Add your own API key in Settings to keep going."*
 - Other 429 codes (burst, `IP_LIMIT`) reuse the existing "slow down" toast behavior.
 
 ## Order of checks in the chat POST
@@ -87,8 +101,8 @@ Word-helper: session → burst limit → validation → user/key load → (if ow
 
 1. `npm run lint` + `npm run build` clean.
 2. Manual on localhost: temporarily set the lifetime cap to 2 → third chat returns 429 with the Settings prompt; counter UI shows remaining correctly.
-3. Save a real NVIDIA key in Settings → chat works past the cap, `aiChatsUsed` stops incrementing, GET returns only the masked key.
-4. Remove key → capped state returns. Invalid key (`nvapi-junk`) → chat surfaces the "key rejected" message.
+3. Save a real key for at least one provider in Settings → chat works past the cap, `aiChatsUsed` stops incrementing, GET returns provider + masked key only. Spot-check a second provider if a key is available.
+4. Remove key → capped state returns. Wrong prefix for the chosen provider → 400 on save. Well-formed but revoked key → chat surfaces the provider-named "key rejected" message.
 5. 2,001-char message → 400. Word-helper past its lifetime cap (temporarily lowered to 2) → 429 with the Settings message.
 6. IP umbrella (temporarily lowered) → 429 `IP_LIMIT` even from a fresh account on the same IP.
 
@@ -98,4 +112,5 @@ Word-helper: session → burst limit → validation → user/key load → (if ow
 - CAPTCHA / email verification on signup (IP umbrella covers the credible bot vector for now).
 - Refunding trial credits on failed model calls.
 - Any reset mechanism for exhausted budgets (per-account or per-IP) — raising the constants and redeploying is the only lever, by design.
+- Custom base URLs / self-hosted or unlisted providers (the provider map is fixed; adding one is a one-row code change).
 - Admin UI for adjusting quotas (constants in code).
