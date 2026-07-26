@@ -23,6 +23,16 @@ const UserSchema = new mongoose.Schema(
       totalTimeSpent: { type: Number, default: 0 }, // seconds
       totalPracticeSessions: { type: Number, default: 0 },
     },
+
+    // Lifetime free-AI budgets (consumed only on the owner's key; BYOK
+    // requests never count). No resets, by design — see the 2026-07-26 spec.
+    aiChatsUsed: { type: Number, default: 0 },
+    aiHelperUsed: { type: Number, default: 0 },
+
+    // Bring-your-own-key: provider id + encrypted key + optional model override
+    aiProvider: { type: String, enum: ["nvidia", "openai", "gemini", "anthropic"] },
+    aiApiKey: { type: String, select: false }, // "iv:tag:ciphertext", AES-256-GCM
+    aiModel: { type: String, default: "" },
   },
   { timestamps: true }
 );
