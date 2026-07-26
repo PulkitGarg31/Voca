@@ -153,7 +153,7 @@ export async function POST(req) {
   } catch (err) {
     console.error("Chat error:", err);
     const status = err?.status ?? err?.response?.status;
-    if (byok && (status === 401 || status === 403 || (byok.provider === "gemini" && status === 400))) {
+    if (byok && (status === 401 || status === 403 || (byok.provider === "gemini" && (status === 400 || status === 404)))) {
       return NextResponse.json(
         { error: `Your ${byok.label} API key was rejected. Check the key (and model, if you set one) in Settings.`, code: "BYOK_REJECTED" },
         { status: 401 }
