@@ -79,7 +79,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 | Variable | Value | Notes |
 |---|---|---|
 | `NEXTAUTH_URL` | `https://<project>.vercel.app` | Your production URL. If you don't know the final URL yet, set it after the first deploy and redeploy. |
-| `NVIDIA_MODEL` | `meta/llama-3.3-70b-instruct` | Optional override; this is the default anyway. |
+| `NVIDIA_MODEL` | `` | Optional override; this is the default anyway. |
 
 ### Optional — Google sign-in
 
@@ -183,6 +183,8 @@ instructions. Afterwards update:
 | Build fails: `Missing required environment variables` | A required var absent in Vercel | Add it (Step 4), redeploy |
 | Every API call 500s / times out | Atlas network access or paused cluster | Allow `0.0.0.0/0`; resume cluster |
 | Login works locally, fails in prod | `NEXTAUTH_URL` wrong or missing | Set to the exact production URL, redeploy |
+| Protected tabs bounce to /login right after a domain change | Session cookies are per-domain — the browser has no session on the new URL | Just log in again on the new domain (clear site cookies if it persists) |
+| One-off 500 on the first request after idle | Serverless cold start + Atlas first connection | Retry; resume the cluster if it was auto-paused |
 | Google login error page | Redirect URI not registered | Add `https://<domain>/api/auth/callback/google` in Google console |
 | Chat replies cut off mid-stream | Function duration cap | `export const maxDuration = 60;` in the chat route |
 | User reports "used all 50 free chats" but is new | They share an exhausted IP, or re-registered after exhausting | Working as designed; they can add their own key |
