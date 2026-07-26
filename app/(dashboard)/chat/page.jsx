@@ -441,6 +441,7 @@ export default function ChatPage() {
           <div className="flex gap-3 items-end">
             <textarea
               rows={1}
+              maxLength={2000}
               className="input flex-1 resize-none max-h-32"
               placeholder={historyLoading ? "Loading…" : "Ask about any word…"}
               value={input}
