@@ -104,9 +104,15 @@ errors out. Leave both unset to hide the button entirely.
 5. Click **Deploy** and wait for the build (~1–2 min). The build log will
    show benign `Dynamic server usage` messages for API routes — Next.js
    probing dynamic routes; they are not errors.
-6. If you guessed `NEXTAUTH_URL` wrong (or skipped it): set it to the real
+6. **If your preferred project name was taken**, Vercel assigns a random
+   production URL. `NEXTAUTH_URL` cannot change your URL — it must follow it.
+   To get a nicer one: **Settings → General → Project Name** (rename; the
+   default domain becomes `<new-name>.vercel.app`) or **Settings → Domains**
+   (add any available `something.vercel.app` subdomain as production domain).
+7. If you guessed `NEXTAUTH_URL` wrong (or skipped it): set it to the real
    URL under Settings → Environment Variables, then **Deployments → ⋯ →
-   Redeploy**.
+   Redeploy**. **Env-var changes never apply to the running deployment — a
+   redeploy is always required.**
 
 From now on, **every push to `main` auto-deploys**.
 
