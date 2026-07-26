@@ -89,7 +89,7 @@ export async function POST(req) {
       const quota = await lifetimeQuota(userId, "aiChatsUsed", LIMITS.chat);
       if (!quota.ok) {
         return NextResponse.json(
-          { error: "You've used all 50 free AI chats. Add your own API key (NVIDIA, OpenAI, Gemini, or Claude) in Settings to keep chatting — NVIDIA keys are free at build.nvidia.com.", code: "TRIAL_EXHAUSTED" },
+          { error: `You've used all ${LIMITS.chat} free AI chats. Add your own API key (NVIDIA, OpenAI, Gemini, or Claude) in Settings to keep chatting — NVIDIA keys are free at build.nvidia.com.`, code: "TRIAL_EXHAUSTED" },
           { status: 429 }
         );
       }

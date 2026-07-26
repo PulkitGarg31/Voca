@@ -40,7 +40,7 @@ export async function POST(req) {
       const quota = await lifetimeQuota(session.user.id, "aiHelperUsed", LIMITS.helper);
       if (!quota.ok) {
         return NextResponse.json(
-          { error: "You've used all 50 free AI word helps. Add your own API key in Settings to keep going.", code: "HELPER_LIMIT" },
+          { error: `You've used all ${LIMITS.helper} free AI word helps. Add your own API key in Settings to keep going.`, code: "HELPER_LIMIT" },
           { status: 429 }
         );
       }
