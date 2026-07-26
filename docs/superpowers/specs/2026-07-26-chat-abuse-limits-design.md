@@ -31,7 +31,8 @@ Nothing resets on a schedule — every quota is a lifetime budget, so the absolu
 
 - Two new fields on [models/User.js](../../../models/User.js): `aiChatsUsed: { type: Number, default: 0 }` and `aiHelperUsed: { type: Number, default: 0 }`.
 - Consumed with one race-safe atomic op per request, e.g. in the chat POST route:
-  `User.findOneAndUpdate({ _id: userId, aiChatsUsed: { $lt: 50 } }, { $inc: { aiChatsUsed: 1 } }, { new: true })`.
+  `User.findOneAndUpdate({ _id: userId, $or: [{ aiChatsUsed: { $lt: 50 } }, { aiChatsUsed: { $exists: false } }] }, { $inc: { aiChatsUsed: 1 } }, { new: true })`.
+  The `$exists: false` arm matters: `$lt` never matches a missing field, and accounts created before this schema change have no persisted counter — without it they'd read as already exhausted.
   A `null` result means the budget is exhausted → 429 `{ error, code: "TRIAL_EXHAUSTED" }` (chat) / `code: "HELPER_LIMIT"` (word-helper, same pattern on `aiHelperUsed`). A shared `lifetimeQuota(userId, field, limit)` helper in a new [lib/quota.js](../../../lib/quota.js) wraps this.
 - Incremented **before** the model call (a request that reaches NVIDIA always counts). Never incremented when the user's own key is used, so removing a BYOK key later restores the untouched remaining balance.
 - Deleted automatically with the account (they are part of the User document). Deliberate consequence: deleting and re-registering an account does reset the per-account budgets — the per-IP umbrella below is what bounds that loop.

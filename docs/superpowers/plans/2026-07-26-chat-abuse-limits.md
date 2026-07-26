@@ -121,8 +121,10 @@ export const LIMITS = {
 // "aiChatsUsed" or "aiHelperUsed". Returns { ok, remaining }; ok:false means
 // the budget was already exhausted (and nothing was consumed).
 export async function lifetimeQuota(userId, field, limit) {
+  // $exists:false counts missing fields as zero — pre-existing accounts
+  // created before this schema change must still get their free budget.
   const updated = await User.findOneAndUpdate(
-    { _id: userId, [field]: { $lt: limit } },
+    { _id: userId, $or: [{ [field]: { $lt: limit } }, { [field]: { $exists: false } }] },
     { $inc: { [field]: 1 } },
     { new: true }
   ).select(field);
