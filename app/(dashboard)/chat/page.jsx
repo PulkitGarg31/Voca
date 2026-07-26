@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 
 // Render **bold** / *italic* markdown as SAFE React nodes (text is escaped by
 // React) instead of injecting HTML — prevents XSS from chat/AI/history content.
@@ -165,6 +166,8 @@ export default function ChatPage() {
   const [streaming, setStreaming] = useState(false);  // reply is arriving token by token
   const [historyLoading, setHistoryLoading] = useState(true);
   const [addedCount, setAddedCount] = useState(0);
+  const [freeLeft, setFreeLeft] = useState(null); // null until a response reveals it (BYOK users never see it)
+  const [trialOver, setTrialOver] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [conversationId, setConversationId] = useState(null);
   const bottomRef = useRef(null);
@@ -244,12 +247,19 @@ export default function ChatPage() {
       // Errors (rate limit, auth, model down) still arrive as JSON.
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        if (res.status === 429 && data.code === "TRIAL_EXHAUSTED") {
+          setFreeLeft(0);
+          setTrialOver(true);
+        }
         setMessages((prev) => [...prev, { role: "assistant", content: data.error || "Something went wrong. Please try again." }]);
         return;
       }
 
       const newId = res.headers.get("X-Conversation-Id");
       if (newId) setConversationId(newId);
+
+      const rem = res.headers.get("X-Free-Chats-Remaining");
+      if (rem !== null) setFreeLeft(Number(rem));
 
       // Stream the reply: keep the typing dots until the first chunk arrives,
       // then grow the assistant bubble token by token.
@@ -439,7 +449,17 @@ export default function ChatPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
             </button>
           </div>
-          <p className="text-[10px] text-faint mt-2 text-center">History saved automatically · Shift+Enter for new line</p>
+          {trialOver ? (
+            <p className="text-[10px] text-faint mt-2 text-center">
+              You&apos;ve used all your free AI chats ·{" "}
+              <Link href="/settings" className="text-accent font-semibold hover:underline">Add your own API key in Settings</Link>
+            </p>
+          ) : (
+            <p className="text-[10px] text-faint mt-2 text-center">
+              History saved automatically · Shift+Enter for new line
+              {freeLeft !== null && <> · {freeLeft} free chats left</>}
+            </p>
+          )}
         </div>
       </div>
     </div>
